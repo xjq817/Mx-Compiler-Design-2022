@@ -3,14 +3,13 @@ package ast.expr;
 import Util.Position;
 import ast.ASTVisitor;
 
-import java.util.ArrayList;
+public class assignExprNode extends ExprNode{
+    public ExprNode lhs, rhs;
 
-public class arrayExprNode extends ExprNode{
-    public ArrayList<ExprNode> exprList;
-
-    public arrayExprNode(Position pos) {
+    public assignExprNode(ExprNode lhs, ExprNode rhs, Position pos) {
         super(pos);
-        this.exprList=new ArrayList<>();
+        this.lhs = lhs;
+        this.rhs = rhs;
     }
 
     @Override

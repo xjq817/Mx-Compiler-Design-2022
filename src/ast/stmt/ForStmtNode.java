@@ -2,16 +2,18 @@ package ast.stmt;
 
 import Util.Position;
 import ast.ASTVisitor;
+import ast.ForInitNode;
 import ast.expr.ExprNode;
 
 public class ForStmtNode extends StmtNode {
-    public ExprNode initialization, condition, execution;
+    public ForInitNode forInit;
+    public ExprNode condition, execution;
     public StmtNode thenStmt;
 
-    public ForStmtNode(ExprNode initialization, ExprNode condition,
+    public ForStmtNode(ForInitNode forInit, ExprNode condition,
                        ExprNode execution, StmtNode thenStmt, Position pos) {
         super(pos);
-        this.initialization = initialization;
+        this.forInit = forInit;
         this.condition = condition;
         this.execution = execution;
         this.thenStmt = thenStmt;

@@ -5,13 +5,13 @@ import ast.ASTVisitor;
 
 import java.util.ArrayList;
 
-public class funcExprNode extends ExprNode{
-    public ExprNode expr;
+public class newExprNode extends ExprNode{
     public ArrayList<ExprNode> exprList;
+    public int layer;
 
-    public funcExprNode(ExprNode expr, Position pos) {
+    public newExprNode(int layer,Position pos) {
         super(pos);
-        this.expr=expr;
+        this.layer=layer;
         this.exprList=new ArrayList<>();
     }
 

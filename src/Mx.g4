@@ -72,13 +72,13 @@ LineComment : '//' ~[\r\n]* -> skip;
 
 program: (classDef|varDef|funcDef)* EOF;
 
-funcDef : (type | Void)? Identifier '(' functionList? ')' suite;
+funcDef : (type | Void)? Identifier '(' functionList ')' suite;
 
-functionList : type Identifier (',' type Identifier)*;
+functionList : (type Identifier (',' type Identifier)*)?;
 
 varDef : type memberInit (',' memberInit)* ';';
 
-memberInit: <assoc=right>(Identifier ('=' expression)?);
+memberInit: Identifier ('=' expression)?;
 
 type : singleType ('[' ']')*;
 
@@ -89,8 +89,6 @@ primitiveType : Int | Bool | String;
 classDef : Class Identifier '{' (varDef|funcDef|classConstructionDef)* '}' ';';
 
 classConstructionDef : Identifier '(' ')' suite;
-
-lamdaExpression : '[' '&'? ']' '(' functionList? ')' '->' suite;
 
 suite : '{' statement* '}';
 
@@ -112,11 +110,13 @@ statement
 expression
     : primary                                                       #atomExpr
     | '(' expression ')'                                            #bracketExpr
-    | lamdaExpression                                               #lamdaExpr
-    | expression op=('++' | '--')                                   #cellExpr
-    | expression '(' memberFunc? ')'                                #funcExpr
+    | '[' '&'? ']' '(' functionList ')' '->' suite                  #lamdaExpr
+    | New singleType ('[' expression? ']')*                         #newExpr
+    | New singleType '('  ')'                                       #newExpr
+    | expression op=('++' | '--')                                   #sufCellExpr
+    | expression '(' (expression (',' expression )*)? ')'           #funcExpr
     | expression '[' expression ']'                                 #arrayExpr
-    | expression '.' expression                                     #objectExpr
+    | expression '.' Identifier                                     #objectExpr
     | <assoc=right> op=('++' | '--') expression                     #cellExpr
     | <assoc=right> op=('!'|'~'|'+'|'-') expression                 #cellExpr
     | expression op=('*' | '/' | '%') expression                    #binaryExpr
@@ -129,10 +129,8 @@ expression
     | expression '|' expression                                     #binaryExpr
     | expression '&&' expression                                    #binaryExpr
     | expression '||' expression                                    #binaryExpr
-    | <assoc=right> expression '=' expression                       #binaryExpr
+    | <assoc=right> expression '=' expression                       #assignExpr
     ;
-
-memberFunc : expression (',' expression )*;
 
 primary
     : DecimalInteger
@@ -142,7 +140,5 @@ primary
     | StringConst
     | This
     | Identifier
-    | New singleType ('[' expression? ']')*
-    | New singleType '('  ')'
     ;
 
