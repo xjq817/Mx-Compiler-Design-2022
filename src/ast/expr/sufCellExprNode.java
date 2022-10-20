@@ -1,19 +1,16 @@
 package ast.expr;
 
 import Util.Position;
-import Util.Type;
 import ast.ASTVisitor;
 
-public class sufCellExprNode extends ExprNode{
-    public ExprNode rhs;
+public class SufCellExprNode extends ExprNode {
+    public ExprNode expr;
+    public String op;
 
-    public String opType;
-
-    public sufCellExprNode(ExprNode rhs, String opType, Type intType, Position pos) {
-        super(pos);
-        this.rhs = rhs;
-        this.opType = opType;
-        type = intType;
+    public SufCellExprNode(ExprNode expr, String op, Position pos) {
+        super(false, pos);
+        this.expr = expr;
+        this.op = op;
     }
 
     @Override

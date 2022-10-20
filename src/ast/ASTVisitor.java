@@ -1,24 +1,14 @@
 package ast;
 
+import ast.def.ParameterNode;
 import ast.expr.*;
+import ast.expr.primary.*;
 import ast.stmt.*;
 
 public interface ASTVisitor {
     void visit(RootNode it);
 
-    void visit(arrayExprNode it);
-
-    void visit(atomExprNode it);
-
-    void visit(binaryExprNode it);
-
-    void visit(cellExprNode it);
-
-    void visit(funcExprNode it);
-
-    void visit(lamdaExprNode it);
-
-    void visit(objectExprNode it);
+    void visit(IfStmtNode it);
 
     void visit(BlockStmtNode it);
 
@@ -28,27 +18,39 @@ public interface ASTVisitor {
 
     void visit(ExprStmtNode it);
 
-    void visit(ForStmtNode it);
-
-    void visit(IfStmtNode it);
+    void visit(EmptyStmtNode it);
 
     void visit(ReturnStmtNode it);
 
     void visit(WhileStmtNode it);
 
-    void visit(VarDefNode it);
+    void visit(ForStmtNode it);
 
-    void visit(ClassDefNode it);
+    void visit(AssignExprNode it);
 
-    void visit(FuncDefNode it);
+    void visit(BinaryExprNode it);
 
-    void visit(ForInitNode it);
+    void visit(CellExprNode it);
 
-    void visit(classCstrDefNode it);
+    void visit(SufCellExprNode it);
 
-    void visit(assignExprNode it);
+    void visit(ArrayExprNode it);
 
-    void visit(sufCellExprNode it);
+    void visit(FuncExprNode it);
 
-    void visit(newExprNode it);
+    void visit(LambdaExprNode it);
+
+    void visit(IntPrimaryNode it);
+
+    void visit(BoolPrimaryNode it);
+
+    void visit(NullPrimaryNode it);
+
+    void visit(ThisPrimaryNode it);
+
+    void visit(StringPrimaryNode it);
+
+    void visit(IdentifierPrimaryNode it);
+
+    void visit(ParameterNode it);
 }

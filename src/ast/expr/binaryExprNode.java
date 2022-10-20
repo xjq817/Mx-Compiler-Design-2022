@@ -1,20 +1,18 @@
 package ast.expr;
 
 import Util.Position;
-import Util.Type;
 import ast.ASTVisitor;
 
-public class binaryExprNode extends ExprNode{
-    public ExprNode lhs, rhs;
+public class BinaryExprNode extends ExprNode{
+    public ExprNode lhs;
+    public ExprNode rhs;
+    public String op;
 
-    public String opType;
-
-    public binaryExprNode(ExprNode lhs, ExprNode rhs, String opType, Type intType, Position pos) {
-        super(pos);
+    public BinaryExprNode(ExprNode lhs, ExprNode rhs, String op, Position pos) {
+        super(false,pos);
         this.lhs = lhs;
         this.rhs = rhs;
-        this.opType = opType;
-        type = intType;
+        this.op = op;
     }
 
     @Override

@@ -1,15 +1,35 @@
 package ast;
 
 import Util.Position;
+import gen.MxParser;
 
 import java.util.ArrayList;
 
 public class RootNode extends ASTNode {
-    public ArrayList<ASTNode> defList;
+    public ArrayList<ASTNode> defs;
+    public boolean inValid;
+    public boolean hasMain;
 
     public RootNode(Position pos) {
         super(pos);
-        this.defList=new ArrayList<>();
+        this.hasMain = false;
+        this.inValid = false;
+        this.defs = new ArrayList<>();
+    }
+
+    public void add(ASTNode def) {
+        defs.add(def);
+        if (def instanceof FuncDefNode && ((FuncDefNode) def).isMain()) {
+            if (this.hasMain) {
+                this.inValid = true;
+            } else {
+                this.hasMain = true;
+            }
+        }
+    }
+
+    public void finishBuild() {
+        if (!this.hasMain) inValid = true;
     }
 
     @Override

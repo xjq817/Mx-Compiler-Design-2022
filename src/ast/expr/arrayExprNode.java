@@ -3,14 +3,14 @@ package ast.expr;
 import Util.Position;
 import ast.ASTVisitor;
 
-import java.util.ArrayList;
+public class ArrayExprNode extends ExprNode {
+    public ExprNode name;
+    public ExprNode id;
 
-public class arrayExprNode extends ExprNode{
-    public ArrayList<ExprNode> exprList;
-
-    public arrayExprNode(Position pos) {
-        super(pos);
-        this.exprList=new ArrayList<>();
+    public ArrayExprNode(ExprNode name, ExprNode id, Position pos) {
+        super(true, pos);
+        this.name = name;
+        this.id = id;
     }
 
     @Override

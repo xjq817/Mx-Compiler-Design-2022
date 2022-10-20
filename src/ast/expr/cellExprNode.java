@@ -1,19 +1,18 @@
 package ast.expr;
 
 import Util.Position;
-import Util.Type;
 import ast.ASTVisitor;
 
-public class cellExprNode extends ExprNode{
-    public ExprNode rhs;
+import java.util.Objects;
 
-    public String opType;
+public class CellExprNode extends ExprNode {
+    public ExprNode expr;
+    public String op;
 
-    public cellExprNode(ExprNode rhs, String opType, Type intType, Position pos) {
-        super(pos);
-        this.rhs = rhs;
-        this.opType = opType;
-        type = intType;
+    public CellExprNode(ExprNode expr, String op, Position pos) {
+        super(Objects.equals(op, "++") || Objects.equals(op, "--"), pos);
+        this.expr = expr;
+        this.op = op;
     }
 
     @Override

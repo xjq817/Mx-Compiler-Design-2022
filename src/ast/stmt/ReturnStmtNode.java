@@ -5,11 +5,11 @@ import ast.ASTVisitor;
 import ast.expr.ExprNode;
 
 public class ReturnStmtNode extends StmtNode {
-    public ExprNode value;
+    public ExprNode expr;
 
-    public ReturnStmtNode(ExprNode value, Position pos) {
+    public ReturnStmtNode(Position pos) {
         super(pos);
-        this.value = value;
+        this.expr = null;
     }
 
     @Override

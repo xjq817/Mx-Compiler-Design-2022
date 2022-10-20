@@ -3,13 +3,16 @@ package ast.expr;
 import Util.Position;
 import ast.ASTVisitor;
 
-public class assignExprNode extends ExprNode{
-    public ExprNode lhs, rhs;
+public class AssignExprNode extends ExprNode {
+    public ExprNode lhs;
+    public ExprNode rhs;
+    public String op;
 
-    public assignExprNode(ExprNode lhs, ExprNode rhs, Position pos) {
-        super(pos);
+    public AssignExprNode(ExprNode lhs, ExprNode rhs, String op, Position pos) {
+        super(true,pos);
         this.lhs = lhs;
         this.rhs = rhs;
+        this.op = op;
     }
 
     @Override

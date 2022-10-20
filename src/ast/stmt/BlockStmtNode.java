@@ -10,7 +10,7 @@ public class BlockStmtNode extends StmtNode {
 
     public BlockStmtNode(Position pos) {
         super(pos);
-        this.stmts = new ArrayList<>();
+        stmts = new ArrayList<>();
     }
 
     @Override

@@ -72,13 +72,21 @@ LineComment : '//' ~[\r\n]* -> skip;
 
 program: (classDef|varDef|funcDef)* EOF;
 
-funcDef : (type | Void)? Identifier '(' functionList ')' suite;
+classDef : Class Identifier '{' (varDef|funcDef|constructionDef)* '}' ';';
 
-functionList : (type Identifier (',' type Identifier)*)?;
+constructionDef : Identifier '(' ')' suite;
 
-varDef : type memberInit (',' memberInit)* ';';
+varDef : type singleVarDef (',' singleVarDef)* ';';
 
-memberInit: Identifier ('=' expression)?;
+singleVarDef: Identifier ('=' expression)?;
+
+funcDef : returnType Identifier '(' parameterList? ')' suite;
+
+returnType : type | Void;
+
+parameterList : parameter (',' parameter)*;
+
+parameter : type Identifier;
 
 type : singleType ('[' ']')*;
 
@@ -86,20 +94,18 @@ singleType : primitiveType | Identifier;
 
 primitiveType : Int | Bool | String;
 
-classDef : Class Identifier '{' (varDef|funcDef|classConstructionDef)* '}' ';';
-
-classConstructionDef : Identifier '(' ')' suite;
-
 suite : '{' statement* '}';
+
+forInitStmt: (expression? ';') | varDef ;
 
 statement
     : suite                                                            #block
     | varDef                                                           #vardefStmt
-    | If '(' expression ')' trueStmt=statement
-        (Else falseStmt=statement)?                                    #ifStmt
-    | While '(' expression ')' trueStmt=statement                      #whileStmt
-    | For '(' (varDef | (expression? ';')) expression?
-        ';' expression? ')' trueStmt=statement                         #forStmt
+    | If '(' expression ')' truestmt=statement
+        (Else falsestmt=statement)?                                    #ifStmt
+    | While '(' expression ')' statement                               #whileStmt
+    | For '(' forInitStmt condition=expression? ';'
+        execution=expression? ')' statement                            #forStmt
     | Break ';'                                                        #breakStmt
     | Continue ';'                                                     #continueStmt
     | Return expression? ';'                                           #returnStmt
@@ -108,37 +114,41 @@ statement
     ;
 
 expression
-    : primary                                                       #atomExpr
-    | '(' expression ')'                                            #bracketExpr
-    | '[' '&'? ']' '(' functionList ')' '->' suite                  #lamdaExpr
-    | New singleType ('[' expression? ']')*                         #newExpr
-    | New singleType '('  ')'                                       #newExpr
-    | expression op=('++' | '--')                                   #sufCellExpr
-    | expression '(' (expression (',' expression )*)? ')'           #funcExpr
-    | expression '[' expression ']'                                 #arrayExpr
-    | expression '.' Identifier                                     #objectExpr
-    | <assoc=right> op=('++' | '--') expression                     #cellExpr
-    | <assoc=right> op=('!'|'~'|'+'|'-') expression                 #cellExpr
-    | expression op=('*' | '/' | '%') expression                    #binaryExpr
-    | expression op=('+' | '-') expression                          #binaryExpr
-    | expression op=('<<' | '>>') expression                        #binaryExpr
-    | expression op=('<' | '<=' | '>' | '>=') expression            #binaryExpr
-    | expression op=('==' | '!=' ) expression                       #binaryExpr
-    | expression '&' expression                                     #binaryExpr
-    | expression '^' expression                                     #binaryExpr
-    | expression '|' expression                                     #binaryExpr
-    | expression '&&' expression                                    #binaryExpr
-    | expression '||' expression                                    #binaryExpr
-    | <assoc=right> expression '=' expression                       #assignExpr
+    : primary                                                                                #atomExpr
+    | newType                                                                                #newTypeExpr
+    | expression '.' Identifier                                                              #objectExpr
+    | '[' '&'? ']' '(' parameterList? ')' '->' suite '(' argumentList? ')'                   #lambdaExpr
+    | expression '(' argumentList? ')'                                                       #funcExpr
+    | name=expression '[' id=expression ']'                                                  #arrayExpr
+    | expression op=('++' | '--')                                                            #sufCellExpr
+    | <assoc=right> op=('++' | '--') expression                                              #cellExpr
+    | <assoc=right> op=('!'|'~'|'+'|'-') expression                                          #cellExpr
+    | lhs=expression op=('*' | '/' | '%') rhs=expression                                     #binaryExpr
+    | lhs=expression op=('+' | '-') rhs=expression                                           #binaryExpr
+    | lhs=expression op=('<<' | '>>') rhs=expression                                         #binaryExpr
+    | lhs=expression op=('<' | '<=' | '>' | '>=') rhs=expression                             #binaryExpr
+    | lhs=expression op=('==' | '!=' ) rhs=expression                                        #binaryExpr
+    | lhs=expression op='&' rhs=expression                                                   #binaryExpr
+    | lhs=expression op='^' rhs=expression                                                   #binaryExpr
+    | lhs=expression op='|' rhs=expression                                                   #binaryExpr
+    | lhs=expression op='&&' rhs=expression                                                  #binaryExpr
+    | lhs=expression op='||' rhs=expression                                                  #binaryExpr
+    | <assoc=right> lhs=expression op='=' rhs=expression                                     #assignExpr
     ;
 
-primary
+primary: '(' expression ')' | literal | This | Identifier;
+
+argumentList: expression (',' expression )*;
+
+newType
+    : New singleType ('[' expression ']')+ ('[' ']')*      #newArrayExpr
+    | New singleType ('(' ')')?                            #newObjExpr
+    ;
+
+literal
     : DecimalInteger
     | True
     | False
     | Null
     | StringConst
-    | This
-    | Identifier
     ;
-

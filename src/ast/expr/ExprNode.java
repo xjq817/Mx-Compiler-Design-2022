@@ -1,20 +1,16 @@
 package ast.expr;
 
-import MIR.entity;
 import Util.Position;
 import Util.Type;
 import ast.ASTNode;
 
 public abstract class ExprNode extends ASTNode {
     public Type type;
-    public entity val;
+    public boolean isLeftValue;
 
-    public ExprNode(Position pos) {
+    public ExprNode(boolean isLeftValue, Position pos) {
         super(pos);
-    }
-
-    public boolean isAssignable() {
-        return false;
+        this.isLeftValue = isLeftValue;
+        type = null;
     }
 }
-

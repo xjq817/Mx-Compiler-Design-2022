@@ -8,15 +8,18 @@ import java.util.HashSet;
 import java.util.Vector;
 
 public class Type {
-    public boolean isInt = false, isBool = false, isString = false, isVoid = false;
+    public int layer = 0;
 
-    public int layer=0;
+    public String name;
 
-    String name = null;
+    public Position pos;
 
-    public HashMap<String, Type> members = null;
+    public boolean isLeftValue;
 
-    public HashMap<String, Pair<Type, Vector<Type>>> functionMembers = null;
-
-    public HashSet<Pair<Type, Vector<Type>>> conStrMembers = null;
+    public Type(String name, int layer, boolean isLeftValue, Position pos) {
+        this.isLeftValue = isLeftValue;
+        this.name = name;
+        this.layer = layer;
+        this.pos = pos;
+    }
 }

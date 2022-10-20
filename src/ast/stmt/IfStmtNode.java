@@ -6,13 +6,15 @@ import ast.expr.ExprNode;
 
 public class IfStmtNode extends StmtNode {
     public ExprNode condition;
-    public StmtNode thenStmt, elseStmt;
+    public StmtNode trueStmt, falseStmt;
+    public boolean hasElse;
 
-    public IfStmtNode(ExprNode condition, StmtNode thenStmt, StmtNode elseStmt, Position pos) {
+    public IfStmtNode(ExprNode condition, Position pos) {
         super(pos);
         this.condition = condition;
-        this.thenStmt = thenStmt;
-        this.elseStmt = elseStmt;
+        this.hasElse = false;
+        this.trueStmt = null;
+        this.falseStmt = null;
     }
 
     @Override
