@@ -2,17 +2,18 @@ package ast.def;
 
 import Util.Position;
 import ast.ASTVisitor;
-import ast.expr.primary.IdentifierPrimaryNode;
 import ast.type.TypeNode;
 
-public class ParameterNode extends DefNode {
-    public TypeNode type;
-    public IdentifierPrimaryNode iden;
+import java.util.ArrayList;
 
-    public ParameterNode(TypeNode type, IdentifierPrimaryNode iden, Position pos) {
+public class VarDefNode extends DefNode {
+    public TypeNode type;
+    public ArrayList<SingleVarDefNode> variables;
+
+    public VarDefNode(TypeNode type, Position pos) {
         super(pos);
         this.type = type;
-        this.iden = iden;
+        this.variables = new ArrayList<>();
     }
 
     @Override

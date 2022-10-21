@@ -1,17 +1,17 @@
-package ast.def;
+package ast.expr;
 
 import Util.Position;
 import ast.ASTVisitor;
 import ast.expr.primary.IdentifierPrimaryNode;
-import ast.type.TypeNode;
 
-public class ParameterNode extends DefNode {
-    public TypeNode type;
+public class ObjectExprNode extends ExprNode {
+
+    public ExprNode expr;
     public IdentifierPrimaryNode iden;
 
-    public ParameterNode(TypeNode type, IdentifierPrimaryNode iden, Position pos) {
-        super(pos);
-        this.type = type;
+    public ObjectExprNode(ExprNode expr, IdentifierPrimaryNode iden, Position pos) {
+        super(expr.isLeftValue, pos);
+        this.expr = expr;
         this.iden = iden;
     }
 

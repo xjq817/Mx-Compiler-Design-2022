@@ -1,9 +1,10 @@
 package ast;
 
-import ast.def.ParameterNode;
+import ast.def.*;
 import ast.expr.*;
 import ast.expr.primary.*;
 import ast.stmt.*;
+import ast.type.*;
 
 public interface ASTVisitor {
     void visit(RootNode it);
@@ -53,4 +54,20 @@ public interface ASTVisitor {
     void visit(IdentifierPrimaryNode it);
 
     void visit(ParameterNode it);
+
+    void visit(ObjectExprNode it);
+
+    void visit(NewTypeExprNode it);
+
+    void visit(ClassDefNode it);
+
+    void visit(ConstructionDefNode it);
+
+    void visit(VarDefNode it);
+
+    void visit(SingleVarDefNode it);
+
+    void visit(FuncDefNode it);
+
+    void visit(TypeNode it);
 }

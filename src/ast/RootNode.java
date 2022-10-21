@@ -1,6 +1,8 @@
 package ast;
 
 import Util.Position;
+import ast.def.DefNode;
+import ast.def.FuncDefNode;
 import gen.MxParser;
 
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ public class RootNode extends ASTNode {
         this.defs = new ArrayList<>();
     }
 
-    public void add(ASTNode def) {
+    public void add(DefNode def) {
         defs.add(def);
         if (def instanceof FuncDefNode && ((FuncDefNode) def).isMain()) {
             if (this.hasMain) {

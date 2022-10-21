@@ -1,3 +1,5 @@
+import Util.MxErrorListener;
+import Util.error.error;
 import gen.MxLexer;
 import gen.MxParser;
 import org.antlr.v4.runtime.CharStreams;
@@ -11,12 +13,17 @@ public class Main {
     public static void main(String[] args) throws Exception{
         String name = "test.mx";
         InputStream input = new FileInputStream(name);
-        MxLexer lexer = new MxLexer(CharStreams.fromStream(input));
-        lexer.removeErrorListeners();
-      //  lexer.addErrorListener(new MxErrorListener());
-        MxParser parser = new MxParser(new CommonTokenStream(lexer));
-        parser.removeErrorListeners();
-      //  parser.addErrorListener(new MxErrorListener());
-        ParseTree parseTreeRoot = parser.program();
+        try {
+            MxLexer lexer = new MxLexer(CharStreams.fromStream(input));
+            lexer.removeErrorListeners();
+            lexer.addErrorListener(new MxErrorListener());
+            MxParser parser = new MxParser(new CommonTokenStream(lexer));
+            parser.removeErrorListeners();
+            parser.addErrorListener(new MxErrorListener());
+            ParseTree parseTreeRoot = parser.program();
+        } catch (error er) {
+            System.err.println(er.toString());
+            throw new RuntimeException();
+        }
     }
 }
