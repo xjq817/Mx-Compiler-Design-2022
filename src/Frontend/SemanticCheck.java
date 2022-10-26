@@ -242,12 +242,14 @@ public class SemanticCheck implements ASTVisitor {
             throw new semanticError("assign Lhs is not leftValue", it.pos);
         Type lType = it.lhs.type;
         Type rType = it.rhs.type;
-        if (rType.isEqual(this.gScope.types.get("null")))
-            it.type = lType;
+        if (rType.isEqual(this.gScope.types.get("null"))
+                && !lType.isEqual(this.gScope.types.get("int"))
+                && !lType.isEqual(this.gScope.types.get("bool")))
+            it.type = new Type(lType);
         else {
             if (Objects.equals(lType.name, rType.name)
-                    && lType.layer == rType.layer)
-                it.type = lType;
+                    && lType.layer >= rType.layer)
+                it.type = new Type(rType);
             else throw new semanticError("assign LhsType and rhsType are not same", it.pos);
         }
     }
@@ -408,8 +410,14 @@ public class SemanticCheck implements ASTVisitor {
             throw new semanticError("curScope has this name: " + it.name.name, it.pos);
         if (it.expr != null) {
             it.expr.accept(this);
-            if (!it.expr.type.isEqual(it.name.type))
-                throw new semanticError("singleVarDef exprType is not same with idenType", it.pos);
+            if (!it.expr.type.isEqual(this.gScope.types.get("null"))
+                    || it.name.type.isEqual(this.gScope.types.get("int"))
+                    || it.name.type.isEqual(this.gScope.types.get("bool"))) {
+                if (!Objects.equals(it.expr.type.name, it.name.type.name))
+                    throw new semanticError("singleVarDef exprType is not same with idenType", it.pos);
+                if (it.expr.type.layer > it.name.type.layer)
+                    throw new semanticError("singleVarDef exprLayer is greater than idenLayer", it.pos);
+            }
         }
     }
 

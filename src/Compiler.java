@@ -11,12 +11,13 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 public class Compiler {
     public static void main(String[] args) throws Exception {
-      /*  String name = "test.mx";
-        InputStream input = new FileInputStream(name);*/
+//        String name = "test.mx";
+//        InputStream input = new FileInputStream(name);
         InputStream input = System.in;
         GlobalScope globalScope = new GlobalScope(null);
         try {
@@ -34,7 +35,7 @@ public class Compiler {
             SemanticCheck semanticCheck = new SemanticCheck(globalScope);
             semanticCheck.visit(ASTRoot);
         } catch (error er) {
-            //System.err.println(er.toString());
+            System.err.println(er.toString());
             throw new RuntimeException();
         }
     }

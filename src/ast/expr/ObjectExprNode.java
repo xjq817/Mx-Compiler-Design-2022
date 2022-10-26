@@ -12,7 +12,7 @@ public class ObjectExprNode extends ExprNode {
 
 
     public ObjectExprNode(ExprNode expr, IdentifierPrimaryNode iden, Position pos) {
-        super(expr.isLeftValue, pos);
+        super(true, pos);
         this.expr = expr;
         this.iden = iden;
     }

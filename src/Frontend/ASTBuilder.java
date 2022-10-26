@@ -67,7 +67,8 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     public ASTNode visitVarDef(MxParser.VarDefContext ctx) {
         VarDefNode ret = new VarDefNode((TypeNode) visit(ctx.type()), new Position(ctx));
         ctx.singleVarDef().forEach(cur -> {
-            ret.variables.add((SingleVarDefNode) visit(cur));
+            SingleVarDefNode singleVarDefNode=(SingleVarDefNode) visit(cur);
+            ret.variables.add(singleVarDefNode);
         });
         return ret;
     }
