@@ -1,21 +1,37 @@
 /*
 Test Package: Sema_Local_Preview
-Test Target: Scope
-Author: 15' Lianming Zheng
-Time: 2019-10-20
+Test Target: Lambda-1
+Author: 17' zwx
 Verdict: Success
-Origin Package: Semantic Extended
+Origin Package: Semantic Pretest
 */
-class A {};
-class B { B() {{{{{ return; }}}}} };  // single return is allowed in constructor
-class C { int func() { return 93; } };
-int main() {}
-void func() {
-    if(false);else;
-    while(true);
-    for(;;);
-    return;
-    {;{{;{{}{}}}};{{};{}}};
-    new A[10][][][];
-    (new C).func() + (new C).func();   // new is a kind of expression
+
+
+int main(){
+    int d = [&](int a) -> {
+        int f = a;
+        int sum = 0;
+        while(f > 0){
+            sum = sum + f;
+            f = f / 4;
+        }
+        int q = [&](int a) -> {
+            int q;
+            if(a > 0){
+                q = [&](int d) -> {
+                    return d + 20;
+                }(a);
+            } else {
+                q = [&](int d) -> {
+                    return d + 10;
+                }(a);
+            }
+            return q;
+        }(sum);
+        return q;
+    }(10086);
+    d++;
+    return d;
 }
+
+

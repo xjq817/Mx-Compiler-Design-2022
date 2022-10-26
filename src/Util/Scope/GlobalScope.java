@@ -51,6 +51,9 @@ public class GlobalScope extends Scope {
         function = new FuncEntity(new FuncScope(voidType, null), "printInt", nullPos);
         function.funcScope.parameters.add(new VarEntity(intType, "n", nullPos));
         this.insFunc(function);
+        function = new FuncEntity(new FuncScope(voidType, null), "printlnInt", nullPos);
+        function.funcScope.parameters.add(new VarEntity(intType, "n", nullPos));
+        this.insFunc(function);
         function = new FuncEntity(new FuncScope(stringType, null), "getString", nullPos);
         this.insFunc(function);
         function = new FuncEntity(new FuncScope(intType, null), "getInt", nullPos);

@@ -325,6 +325,7 @@ public class SemanticCheck implements ASTVisitor {
         it.type = new Type(this.gScope.types.get("null"));
         this.curScope = new FuncScope(null, this.curScope);
         ((FuncScope) this.curScope).isLambda = true;
+        ((FuncScope) this.curScope).returnType = it.type;
         if (it.parameters.size() != it.exprs.size())
             throw new semanticError("lambdaExpr: number of parameters and arguments are not same", it.pos);
         for (int i = 0; i < it.parameters.size(); i++) {
@@ -391,13 +392,12 @@ public class SemanticCheck implements ASTVisitor {
                 } else funcScope.returnType = this.gScope.types.get("void");
             } else {
                 if (it.expr != null) {
-                    if (it.expr.type.isEqual(this.gScope.types.get("null"))){
+                    if (it.expr.type.isEqual(this.gScope.types.get("null"))) {
                         if (funcScope.returnType.isEqual(this.gScope.types.get("int"))
                                 || funcScope.returnType.isEqual(this.gScope.types.get("bool"))) {
                             throw new semanticError("int or bool function return null", it.pos);
                         }
-                    }
-                    else if (!funcScope.returnType.isEqual(it.expr.type))
+                    } else if (!funcScope.returnType.isEqual(it.expr.type))
                         throw new semanticError("return exprType is not same with function returnType", it.pos);
                 } else if (!funcScope.returnType.isEqual(this.gScope.types.get("void")))
                     throw new semanticError("return exprType is not same with function returnType", it.pos);
@@ -413,6 +413,11 @@ public class SemanticCheck implements ASTVisitor {
     @Override
     public void visit(NewTypeExprNode it) {
         it.type = it.newType.transType(this.gScope);
+        it.exprs.forEach(cur -> {
+            cur.accept(this);
+            if (!cur.type.isEqual(this.gScope.types.get("int")))
+                throw new semanticError("new expr index is not int", cur.pos);
+        });
     }
 
     @Override
@@ -473,8 +478,6 @@ public class SemanticCheck implements ASTVisitor {
 
     @Override
     public void visit(IdentifierPrimaryNode it) {
-        if (!curScope.hasIdentifier(it.name))
-            throw new semanticError("undefined identifier", it.pos);
         if (it.isVar) {
             VarEntity varEntity = curScope.getVarEntity(it.name);
             if (varEntity == null) throw new semanticError("cannot find this var: " + it.name, it.pos);

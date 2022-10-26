@@ -323,10 +323,8 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     public ASTNode visitNewArrayExpr(MxParser.NewArrayExprContext ctx) {
         TypeNode newType = (TypeNode) visit(ctx.singleType());
         NewTypeExprNode ret = new NewTypeExprNode(newType, new Position(ctx));
-//        ret.newType.layer = 1;
         ctx.expression().forEach(cur -> {
             ret.exprs.add((ExprNode) visit(cur));
-//            ret.newType.layer--;
         });
         for (var cur : ctx.getText().toCharArray()) {
             if (Objects.equals(cur, '[')) ret.newType.layer++;

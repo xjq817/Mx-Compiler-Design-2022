@@ -1,5 +1,6 @@
 package Util.Scope;
 
+import Util.Entity.Entity;
 import Util.Entity.FuncEntity;
 import Util.Entity.VarEntity;
 
@@ -60,17 +61,17 @@ abstract public class Scope {
         return null;
     }
 
-    public boolean hasIdentifier(String name) {
-        if (this instanceof FuncScope) {
-            for (var cur : ((FuncScope) this).parameters) {
-                if (Objects.equals(cur.name, name)) return true;
-            }
-        }
-        if (this.varEntities.containsKey(name)) return true;
-        if (this.funcEntities.containsKey(name)) return true;
-        if (this.parentScope != null) return this.parentScope.hasIdentifier(name);
-        return false;
-    }
+//    public Entity hasIdentifier(String name) {
+//        if (this instanceof FuncScope) {
+//            for (var cur : ((FuncScope) this).parameters) {
+//                if (Objects.equals(cur.name, name)) return cur;
+//            }
+//        }
+//        if (this.varEntities.containsKey(name)) return this.varEntities.get(name);
+//        if (this.funcEntities.containsKey(name)) return this.funcEntities.get(name);
+//        if (this.parentScope != null) return this.parentScope.hasIdentifier(name);
+//        return null;
+//    }
 
     public boolean isInLoopScope() {
         if (this instanceof LoopScope) return true;
