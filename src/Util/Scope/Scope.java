@@ -46,8 +46,9 @@ abstract public class Scope {
         return null;
     }
 
-    public FuncScope getFunctionScope() {
+    public Scope getFunctionScope() {
         if (this instanceof FuncScope) return (FuncScope) this;
+        if (this instanceof ConstructionScope) return (ConstructionScope) this;
         if (this.parentScope != null)
             return this.parentScope.getFunctionScope();
         return null;

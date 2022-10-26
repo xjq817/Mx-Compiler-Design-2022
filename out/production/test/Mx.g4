@@ -64,7 +64,7 @@ False : 'false';
 StringConst : '"' ('\\"'| '\\\\' | '\\n' | .)*? '"' ;
 DecimalInteger : [1-9] [0-9]* | '0' ;
 
-Identifier : ('_'|[a-zA-Z])([0-9a-zA-Z]|'_')*;
+Identifier : ([a-zA-Z])([0-9a-zA-Z]|'_')*;
 Whitespace : [ \t]+ -> skip;
 Newline : ( '\r' '\n'? | '\n' ) -> skip;
 BlockComment : '/*' .*? '*/' -> skip;
@@ -141,8 +141,9 @@ primary: '(' expression ')' | literal | This | Identifier;
 argumentList: expression (',' expression )*;
 
 newType
-    : New singleType ('[' expression ']')+ ('[' ']')*      #newArrayExpr
-    | New singleType ('(' ')')?                            #newObjExpr
+    : New singleType ('[' expression ']')* ('[' ']')+ ('[' expression ']')+       #newErrorExpr
+    | New singleType ('[' expression ']')+ ('[' ']')*                             #newArrayExpr
+    | New singleType ('(' ')')?                                                   #newObjExpr
     ;
 
 literal

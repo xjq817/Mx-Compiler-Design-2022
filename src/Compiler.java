@@ -35,7 +35,7 @@ public class Compiler {
             SemanticCheck semanticCheck = new SemanticCheck(globalScope);
             semanticCheck.visit(ASTRoot);
         } catch (error er) {
-            System.err.println(er.toString());
+//            System.err.println(er.toString());
             throw new RuntimeException();
         }
     }

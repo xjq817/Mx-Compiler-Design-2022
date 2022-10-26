@@ -164,9 +164,13 @@ public class SemanticCheck implements ASTVisitor {
                         funcEntity = null;
                     else {
                         for (int i = 0; i < it.arguments.size(); i++) {
-                            if (!funcEntity.funcScope.parameters.get(i).varType.isEqual(it.arguments.get(i).type)) {
-                                funcEntity = null;
-                                break;
+                            if (!it.arguments.get(i).type.isEqual(this.gScope.types.get("null"))
+                                    || funcEntity.funcScope.parameters.get(i).varType.isEqual(this.gScope.types.get("int"))
+                                    || funcEntity.funcScope.parameters.get(i).varType.isEqual(this.gScope.types.get("bool"))) {
+                                if (!funcEntity.funcScope.parameters.get(i).varType.isEqual(it.arguments.get(i).type)) {
+                                    funcEntity = null;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -179,9 +183,13 @@ public class SemanticCheck implements ASTVisitor {
                         funcEntity = null;
                     else {
                         for (int i = 0; i < it.arguments.size(); i++) {
-                            if (!funcEntity.funcScope.parameters.get(i).varType.isEqual(it.arguments.get(i).type)) {
-                                funcEntity = null;
-                                break;
+                            if (!it.arguments.get(i).type.isEqual(this.gScope.types.get("null"))
+                                    || funcEntity.funcScope.parameters.get(i).varType.isEqual(this.gScope.types.get("int"))
+                                    || funcEntity.funcScope.parameters.get(i).varType.isEqual(this.gScope.types.get("bool"))) {
+                                if (!funcEntity.funcScope.parameters.get(i).varType.isEqual(it.arguments.get(i).type)) {
+                                    funcEntity = null;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -209,6 +217,9 @@ public class SemanticCheck implements ASTVisitor {
     @Override
     public void visit(ArrayExprNode it) {
         it.name.accept(this);
+        it.id.accept(this);
+        if (!it.id.type.isEqual(this.gScope.types.get("int")))
+            throw new semanticError("array index should be int", it.pos);
         it.type = new Type(it.name.type);
         if (!this.gScope.types.containsKey(it.type.name))
             throw new semanticError("there is not this type: " + it.type.name, it.pos);
@@ -248,7 +259,7 @@ public class SemanticCheck implements ASTVisitor {
             it.type = new Type(lType);
         else {
             if (Objects.equals(lType.name, rType.name)
-                    && lType.layer >= rType.layer)
+                    && lType.layer == rType.layer)
                 it.type = new Type(rType);
             else throw new semanticError("assign LhsType and rhsType are not same", it.pos);
         }
@@ -311,6 +322,7 @@ public class SemanticCheck implements ASTVisitor {
 
     @Override
     public void visit(LambdaExprNode it) {
+        it.type = new Type(this.gScope.types.get("null"));
         this.curScope = new FuncScope(null, this.curScope);
         ((FuncScope) this.curScope).isLambda = true;
         if (it.parameters.size() != it.exprs.size())
@@ -354,21 +366,42 @@ public class SemanticCheck implements ASTVisitor {
 
     @Override
     public void visit(ReturnStmtNode it) {
-        FuncScope funcScope = this.curScope.getFunctionScope();
-        if (funcScope == null)
+        Scope scope = this.curScope.getFunctionScope();
+        if (scope == null)
             throw new semanticError("returnStmt is not in function", it.pos);
         if (it.expr != null)
             it.expr.accept(this);
-        if (funcScope.isLambda) {
-            if (it.expr != null)
-                funcScope.returnType = it.expr.type;
-            else funcScope.returnType = this.gScope.types.get("void");
-        } else {
-            if (it.expr != null) {
-                if (!funcScope.returnType.isEqual(it.expr.type))
+        if (scope instanceof ConstructionScope && it.expr != null)
+            throw new semanticError("construction should not return expr", it.pos);
+        if (scope instanceof FuncScope) {
+            FuncScope funcScope = (FuncScope) scope;
+            if (funcScope.isLambda) {
+                if (it.expr != null) {
+                    if (it.expr.type.isEqual(this.gScope.types.get("null"))) {
+                        if (funcScope.returnType.isEqual(this.gScope.types.get("int"))
+                                || funcScope.returnType.isEqual(this.gScope.types.get("bool"))) {
+                            throw new semanticError("int or bool function return null", it.pos);
+                        }
+                    } else {
+                        if (funcScope.returnType.isEqual(this.gScope.types.get("null")))
+                            funcScope.returnType = it.expr.type;
+                        else if (!funcScope.returnType.isEqual(it.expr.type))
+                            throw new semanticError("return exprType is not same with function returnType", it.pos);
+                    }
+                } else funcScope.returnType = this.gScope.types.get("void");
+            } else {
+                if (it.expr != null) {
+                    if (it.expr.type.isEqual(this.gScope.types.get("null"))){
+                        if (funcScope.returnType.isEqual(this.gScope.types.get("int"))
+                                || funcScope.returnType.isEqual(this.gScope.types.get("bool"))) {
+                            throw new semanticError("int or bool function return null", it.pos);
+                        }
+                    }
+                    else if (!funcScope.returnType.isEqual(it.expr.type))
+                        throw new semanticError("return exprType is not same with function returnType", it.pos);
+                } else if (!funcScope.returnType.isEqual(this.gScope.types.get("void")))
                     throw new semanticError("return exprType is not same with function returnType", it.pos);
-            } else if (!funcScope.returnType.isEqual(this.gScope.types.get("void")))
-                throw new semanticError("return exprType is not same with function returnType", it.pos);
+            }
         }
     }
 
@@ -394,6 +427,7 @@ public class SemanticCheck implements ASTVisitor {
             throw new semanticError("suf cell op:" + it.op + ", and exprType is not int", it.pos);
         if (!it.expr.isLeftValue)
             throw new semanticError("suf cell op:" + it.op + ", and expr is not isLeftValue", it.pos);
+        it.type = it.expr.type;
     }
 
     @Override
@@ -415,7 +449,7 @@ public class SemanticCheck implements ASTVisitor {
                     || it.name.type.isEqual(this.gScope.types.get("bool"))) {
                 if (!Objects.equals(it.expr.type.name, it.name.type.name))
                     throw new semanticError("singleVarDef exprType is not same with idenType", it.pos);
-                if (it.expr.type.layer > it.name.type.layer)
+                if (it.expr.type.layer != it.name.type.layer)
                     throw new semanticError("singleVarDef exprLayer is greater than idenLayer", it.pos);
             }
         }

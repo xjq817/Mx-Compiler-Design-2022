@@ -15,6 +15,8 @@ import ast.expr.primary.*;
 import ast.stmt.*;
 import ast.type.TypeNode;
 
+import java.util.Objects;
+
 public class SymbolCollector implements ASTVisitor {
     public GlobalScope gScope;
     public Scope curScope;
@@ -87,8 +89,12 @@ public class SymbolCollector implements ASTVisitor {
                 throw new syntaxError("there exists more classes with same name", it.pos);
             curScope = new ClassScope(it.name.name, gScope);
             Type type = new Type(it.name.name);
-            it.functions.forEach(cur -> cur.accept(this));
             it.constructions.forEach(cur -> cur.accept(this));
+            it.functions.forEach(cur -> {
+                if (Objects.equals(cur.name.name,it.name.name))
+                    throw new syntaxError("classFunc name is same with class name",cur.pos);
+                cur.accept(this);
+            });
             type.classScope = (ClassScope) curScope;
             gScope.types.put(it.name.name, type);
             curScope = gScope;
@@ -99,6 +105,8 @@ public class SymbolCollector implements ASTVisitor {
             it.variables.forEach(cur -> {
                 cur.variables.forEach(vari -> {
                     VarEntity varEntity = new VarEntity(cur.type.transType(gScope), vari.name.name, vari.pos);
+                    if (curScope.varEntities.containsKey(vari.name.name))
+                        throw new syntaxError("varName is repeated",it.pos);
                     curScope.varEntities.put(vari.name.name, varEntity);
                 });
             });

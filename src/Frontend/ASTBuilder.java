@@ -67,7 +67,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     public ASTNode visitVarDef(MxParser.VarDefContext ctx) {
         VarDefNode ret = new VarDefNode((TypeNode) visit(ctx.type()), new Position(ctx));
         ctx.singleVarDef().forEach(cur -> {
-            SingleVarDefNode singleVarDefNode=(SingleVarDefNode) visit(cur);
+            SingleVarDefNode singleVarDefNode = (SingleVarDefNode) visit(cur);
             ret.variables.add(singleVarDefNode);
         });
         return ret;
@@ -315,13 +315,18 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     }
 
     @Override
+    public ASTNode visitNewErrorExpr(MxParser.NewErrorExprContext ctx) {
+        throw new internalError("there exists error new expr", new Position(ctx));
+    }
+
+    @Override
     public ASTNode visitNewArrayExpr(MxParser.NewArrayExprContext ctx) {
         TypeNode newType = (TypeNode) visit(ctx.singleType());
         NewTypeExprNode ret = new NewTypeExprNode(newType, new Position(ctx));
-        ret.newType.layer = 1;
+//        ret.newType.layer = 1;
         ctx.expression().forEach(cur -> {
             ret.exprs.add((ExprNode) visit(cur));
-            ret.newType.layer--;
+//            ret.newType.layer--;
         });
         for (var cur : ctx.getText().toCharArray()) {
             if (Objects.equals(cur, '[')) ret.newType.layer++;

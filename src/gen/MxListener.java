@@ -408,6 +408,18 @@ public interface MxListener extends ParseTreeListener {
 	 */
 	void exitArgumentList(MxParser.ArgumentListContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code newErrorExpr}
+	 * labeled alternative in {@link MxParser#newType}.
+	 * @param ctx the parse tree
+	 */
+	void enterNewErrorExpr(MxParser.NewErrorExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code newErrorExpr}
+	 * labeled alternative in {@link MxParser#newType}.
+	 * @param ctx the parse tree
+	 */
+	void exitNewErrorExpr(MxParser.NewErrorExprContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code newArrayExpr}
 	 * labeled alternative in {@link MxParser#newType}.
 	 * @param ctx the parse tree
