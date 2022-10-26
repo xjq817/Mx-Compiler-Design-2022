@@ -7,14 +7,12 @@ import ast.type.TypeNode;
 import java.util.ArrayList;
 
 public class NewTypeExprNode extends ExprNode {
-    public TypeNode type;
-    public int layer;
+    public TypeNode newType;
     public ArrayList<ExprNode> exprs;
 
-    public NewTypeExprNode(TypeNode type, Position pos) {
+    public NewTypeExprNode(TypeNode newType, Position pos) {
         super(false, pos);
-        this.type = type;
-        this.layer = 0;
+        this.newType = newType;
         this.exprs = new ArrayList<>();
     }
 

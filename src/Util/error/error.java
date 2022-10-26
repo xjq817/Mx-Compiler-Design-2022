@@ -2,8 +2,8 @@ package Util.error;
 import Util.Position;
 
 abstract public class error extends RuntimeException {
-    private Position pos;
-    private String message;
+    private final Position pos;
+    private final String message;
 
     public error(String msg, Position pos) {
         this.pos = pos;

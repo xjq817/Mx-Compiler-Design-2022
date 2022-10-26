@@ -1,6 +1,7 @@
 package Frontend;
 
 import Util.Position;
+import Util.error.internalError;
 import ast.ASTNode;
 import ast.RootNode;
 import ast.def.*;
@@ -27,7 +28,6 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
                 ret.add((VarDefNode) visit(cur));
             }
         }
-        ;
         ret.finishBuild();
         return ret;
     }
@@ -46,7 +46,6 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
                 ret.variables.add((VarDefNode) visit(cur));
             }
         }
-        ;
         return ret;
     }
 
@@ -104,8 +103,8 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitReturnType(MxParser.ReturnTypeContext ctx) {
-        if (ctx.Void()!=null)
-            return new TypeNode("Void",new Position(ctx));
+        if (ctx.Void() != null)
+            return new TypeNode("void", new Position(ctx));
         return visit(ctx.type());
     }
 
@@ -120,17 +119,17 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitType(MxParser.TypeContext ctx) {
         TypeNode type = (TypeNode) visit(ctx.singleType());
-        for (var cur:ctx.getText().toCharArray()){
-            if (Objects.equals(cur,'[')) type.layer++;
+        for (var cur : ctx.getText().toCharArray()) {
+            if (Objects.equals(cur, '[')) type.layer++;
         }
         return type;
     }
 
     @Override
     public ASTNode visitSingleType(MxParser.SingleTypeContext ctx) {
-        if (ctx.Identifier()!=null)
-            return new TypeNode(ctx.Identifier().getText(),new Position(ctx));
-        return new TypeNode(ctx.primitiveType().getText(),new Position(ctx));
+        if (ctx.Identifier() != null)
+            return new TypeNode(ctx.Identifier().getText(), new Position(ctx));
+        return new TypeNode(ctx.primitiveType().getText(), new Position(ctx));
     }
 
     @Override
@@ -138,10 +137,8 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
         ExprNode conditionExpression = (ExprNode) visit(ctx.expression());
         IfStmtNode ret = new IfStmtNode(conditionExpression, new Position(ctx));
         ret.trueStmt = (StmtNode) visit(ctx.truestmt);
-        if (ctx.falsestmt != null) {
+        if (ctx.falsestmt != null)
             ret.falseStmt = (StmtNode) visit(ctx.falsestmt);
-            ret.hasElse = true;
-        }
         return ret;
     }
 
@@ -253,6 +250,13 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
     @Override
     public ASTNode visitFuncExpr(MxParser.FuncExprContext ctx) {
         ExprNode expr = (ExprNode) visit(ctx.expression());
+        if (expr instanceof ObjectExprNode) {
+            ((ObjectExprNode) expr).iden.isVar = false;
+            ((ObjectExprNode) expr).iden.isFunc = true;
+        } else if (expr instanceof IdentifierPrimaryNode) {
+            ((IdentifierPrimaryNode) expr).isVar = false;
+            ((IdentifierPrimaryNode) expr).isFunc = true;
+        } else throw new internalError("functionExpr is invalid", new Position(ctx));
         FuncExprNode ret = new FuncExprNode(expr, new Position(ctx));
         if (ctx.argumentList() != null) {
             ctx.argumentList().expression().forEach(cur -> {
@@ -311,13 +315,15 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitNewArrayExpr(MxParser.NewArrayExprContext ctx) {
-        TypeNode type = (TypeNode) visit(ctx.singleType());
-        NewTypeExprNode ret = new NewTypeExprNode(type, new Position(ctx));
+        TypeNode newType = (TypeNode) visit(ctx.singleType());
+        NewTypeExprNode ret = new NewTypeExprNode(newType, new Position(ctx));
+        ret.newType.layer = 1;
         ctx.expression().forEach(cur -> {
             ret.exprs.add((ExprNode) visit(cur));
+            ret.newType.layer--;
         });
         for (var cur : ctx.getText().toCharArray()) {
-            if (Objects.equals(cur, '[')) ret.layer++;
+            if (Objects.equals(cur, '[')) ret.newType.layer++;
         }
         return ret;
     }

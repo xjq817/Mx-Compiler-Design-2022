@@ -1,21 +1,19 @@
 package ast;
 
 import Util.Position;
+import Util.error.syntaxError;
 import ast.def.DefNode;
 import ast.def.FuncDefNode;
-import gen.MxParser;
 
 import java.util.ArrayList;
 
 public class RootNode extends ASTNode {
     public ArrayList<ASTNode> defs;
-    public boolean inValid;
     public boolean hasMain;
 
     public RootNode(Position pos) {
         super(pos);
         this.hasMain = false;
-        this.inValid = false;
         this.defs = new ArrayList<>();
     }
 
@@ -23,7 +21,7 @@ public class RootNode extends ASTNode {
         defs.add(def);
         if (def instanceof FuncDefNode && ((FuncDefNode) def).isMain()) {
             if (this.hasMain) {
-                this.inValid = true;
+                throw new syntaxError("program has more main", this.pos);
             } else {
                 this.hasMain = true;
             }
@@ -31,7 +29,8 @@ public class RootNode extends ASTNode {
     }
 
     public void finishBuild() {
-        if (!this.hasMain) inValid = true;
+        if (!this.hasMain)
+            throw new syntaxError("program has not main", this.pos);
     }
 
     @Override
