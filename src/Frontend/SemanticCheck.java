@@ -36,15 +36,17 @@ public class SemanticCheck implements ASTVisitor {
             throw new semanticError("if condition is not bool", it.pos);
         this.curScope = new BlockScope(this.curScope);
         this.curScope.parentScope.blockScopes.add(this.curScope);
+        it.scopeId = this.curScope.blockScopes.size() - 1;
         it.trueStmt.accept(this);
         this.curScope = this.curScope.parentScope;
-        this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
+//        this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
         if (it.falseStmt != null) {
             this.curScope = new BlockScope(this.curScope);
             this.curScope.parentScope.blockScopes.add(this.curScope);
+            it.elseScopeId = this.curScope.blockScopes.size() - 1;
             it.falseStmt.accept(this);
             this.curScope = this.curScope.parentScope;
-            this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
+//            this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
         }
     }
 
@@ -52,20 +54,21 @@ public class SemanticCheck implements ASTVisitor {
     public void visit(BlockStmtNode it) {
         this.curScope = new BlockScope(this.curScope);
         this.curScope.parentScope.blockScopes.add(this.curScope);
+        it.scopeId = this.curScope.blockScopes.size() - 1;
         it.stmts.forEach(cur -> cur.accept(this));
         this.curScope = this.curScope.parentScope;
-        this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
+//        this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
     }
 
     @Override
     public void visit(BreakStmtNode it) {
-        if (!curScope.isInLoopScope())
+        if (curScope.getLoopScope() == null)
             throw new semanticError("break not in loopScope", it.pos);
     }
 
     @Override
     public void visit(ContinueStmtNode it) {
-        if (!curScope.isInLoopScope())
+        if (curScope.getLoopScope() == null)
             throw new semanticError("continue not in loopScope", it.pos);
     }
 
@@ -99,6 +102,7 @@ public class SemanticCheck implements ASTVisitor {
     public void visit(ForStmtNode it) {
         this.curScope = new LoopScope(this.curScope);
         this.curScope.parentScope.blockScopes.add(this.curScope);
+        it.scopeId = this.curScope.blockScopes.size() - 1;
         if (it.forInitStmt != null)
             it.forInitStmt.accept(this);
         if (it.condition != null) {
@@ -110,7 +114,7 @@ public class SemanticCheck implements ASTVisitor {
             it.execution.accept(this);
         it.thenStmt.accept(this);
         this.curScope = this.curScope.parentScope;
-        this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
+//        this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
     }
 
     @Override
@@ -235,14 +239,15 @@ public class SemanticCheck implements ASTVisitor {
 
     @Override
     public void visit(WhileStmtNode it) {
-        this.curScope = new LoopScope(this.curScope);
-        this.curScope.parentScope.blockScopes.add(this.curScope);
         it.condition.accept(this);
         if (!it.condition.type.isEqual(this.gScope.types.get("bool")))
             throw new semanticError("while condition is not a bool expression", it.pos);
+        this.curScope = new LoopScope(this.curScope);
+        this.curScope.parentScope.blockScopes.add(this.curScope);
+        it.scopeId = this.curScope.blockScopes.size() - 1;
         it.thenStmt.accept(this);
         this.curScope = this.curScope.parentScope;
-        this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
+//        this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
     }
 
     @Override
@@ -307,11 +312,11 @@ public class SemanticCheck implements ASTVisitor {
                 else throw new semanticError("lhs and rhs in op:[" + it.op + "] are not int or string or bool", it.pos);
             } else it.type = boolType;
         } else if (Objects.equals(it.op, "&&") || Objects.equals(it.op, "||")) {
-            if (!lType.isEqual(nullType) && !rType.isEqual(nullType)) {
-                if (lType.isEqual(boolType) && rType.isEqual(boolType))
-                    it.type = boolType;
-                else throw new semanticError("lhs and rhs in op:[" + it.op + "] are not bool", it.pos);
-            }
+//            if (!lType.isEqual(nullType) && !rType.isEqual(nullType)) {
+            if (lType.isEqual(boolType) && rType.isEqual(boolType))
+                it.type = boolType;
+            else throw new semanticError("lhs and rhs in op:[" + it.op + "] are not bool", it.pos);
+//            }
         }
     }
 

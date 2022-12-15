@@ -1,6 +1,5 @@
 package Util.Scope;
 
-import Util.Entity.Entity;
 import Util.Entity.FuncEntity;
 import Util.Entity.VarEntity;
 
@@ -48,8 +47,8 @@ abstract public class Scope {
     }
 
     public Scope getFunctionScope() {
-        if (this instanceof FuncScope) return (FuncScope) this;
-        if (this instanceof ConstructionScope) return (ConstructionScope) this;
+        if (this instanceof FuncScope) return this;
+        if (this instanceof ConstructionScope) return this;
         if (this.parentScope != null)
             return this.parentScope.getFunctionScope();
         return null;
@@ -73,9 +72,9 @@ abstract public class Scope {
 //        return null;
 //    }
 
-    public boolean isInLoopScope() {
-        if (this instanceof LoopScope) return true;
-        if (this.parentScope != null) return this.parentScope.isInLoopScope();
-        return false;
+    public LoopScope getLoopScope() {
+        if (this instanceof LoopScope) return (LoopScope) this;
+        if (this.parentScope != null) return this.parentScope.getLoopScope();
+        return null;
     }
 }

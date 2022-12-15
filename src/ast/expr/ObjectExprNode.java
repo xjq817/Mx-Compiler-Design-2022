@@ -1,12 +1,10 @@
 package ast.expr;
 
 import Util.Position;
-import Util.Type.Type;
 import ast.ASTVisitor;
 import ast.expr.primary.IdentifierPrimaryNode;
 
-public class ObjectExprNode extends ExprNode {
-
+public class ObjectExprNode extends LeftValueExprNode {
     public ExprNode expr;
     public IdentifierPrimaryNode iden;
 

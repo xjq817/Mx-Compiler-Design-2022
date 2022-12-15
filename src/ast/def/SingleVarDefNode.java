@@ -1,5 +1,6 @@
 package ast.def;
 
+import IR.IRType.IRType;
 import Util.Position;
 import ast.ASTVisitor;
 import ast.expr.ExprNode;

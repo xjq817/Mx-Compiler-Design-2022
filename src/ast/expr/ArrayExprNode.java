@@ -3,7 +3,7 @@ package ast.expr;
 import Util.Position;
 import ast.ASTVisitor;
 
-public class ArrayExprNode extends ExprNode {
+public class ArrayExprNode extends LeftValueExprNode {
     public ExprNode name;
     public ExprNode id;
 
