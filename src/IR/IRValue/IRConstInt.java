@@ -9,4 +9,9 @@ public class IRConstInt extends IRConst {
         super(IRGlobalBlock.intType);
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return Integer.toString(value);
+    }
 }

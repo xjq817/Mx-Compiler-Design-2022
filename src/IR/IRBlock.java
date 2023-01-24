@@ -11,7 +11,7 @@ public class IRBlock {
     public IRLabel label;
     public ArrayList<IRInstruction> instructions;
     public ArrayList<IRBlock> successors;
-    public ArrayList<IRAllocaInstruction> allocaIns;
+//    public ArrayList<IRAllocaInstruction> allocaIns;
     public IRInstruction exitInstruction;
 
     public IRBlock(IRFunction parentFunction, String labelName) {
@@ -19,7 +19,7 @@ public class IRBlock {
         this.label = new IRLabel(parentFunction.name + "." + labelName, this);
         this.instructions = new ArrayList<>();
         this.successors = new ArrayList<>();
-        this.allocaIns = new ArrayList<>();
+//        this.allocaIns = new ArrayList<>();
         this.exitInstruction = null;
     }
 

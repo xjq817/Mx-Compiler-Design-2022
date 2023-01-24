@@ -10,6 +10,10 @@ import java.io.PrintStream;
 public class IRPrinter implements IRVisitor {
     public PrintStream ps;
 
+    public IRPrinter(PrintStream ps) {
+        this.ps = ps;
+    }
+
     @Override
     public void visit(IRAllocaInstruction it) {
         ps.println(it.toString());
@@ -86,6 +90,8 @@ public class IRPrinter implements IRVisitor {
         it.classTypes.forEach(cur -> cur.accept(this));
         ps.println();
         it.irGlobalDefines.forEach((name, cur) -> cur.accept(this));
+        ps.println();
+        it.singleInitFunctions.forEach(cur -> cur.accept(this));
         ps.println();
         it.functions.forEach((name, func) -> {
             if (!func.declare) func.accept(this);

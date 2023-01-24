@@ -9,4 +9,9 @@ public class IRConstBool extends IRConst {
         super(IRGlobalBlock.boolType);
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return value ? "true" : "false";
+    }
 }

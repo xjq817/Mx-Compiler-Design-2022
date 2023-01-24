@@ -14,7 +14,7 @@ public class IRConstString extends IRConst {
         this.originStr = str;
         this.id = id;
         this.str = trans(str);
-        this.length = this.str.length();
+        this.length = this.str.length() + 1;
     }
 
     public String trans(String str) {
@@ -36,7 +36,7 @@ public class IRConstString extends IRConst {
     }
 
     public String irPrint() {
-        return "@.str." + id + " = private unnamed_addr constant [" + length + " x i8] c\"" + str + "\\00\"";
+        return "@.str." + id + " = private unnamed_addr constant [" + length + " x i8] c\"" + toPrint(str) + "\\00\"";
     }
 
     @Override

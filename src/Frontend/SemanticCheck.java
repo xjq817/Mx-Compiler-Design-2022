@@ -36,14 +36,14 @@ public class SemanticCheck implements ASTVisitor {
             throw new semanticError("if condition is not bool", it.pos);
         this.curScope = new BlockScope(this.curScope);
         this.curScope.parentScope.blockScopes.add(this.curScope);
-        it.scopeId = this.curScope.blockScopes.size() - 1;
+        it.scopeId = this.curScope.parentScope.blockScopes.size() - 1;
         it.trueStmt.accept(this);
         this.curScope = this.curScope.parentScope;
 //        this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
         if (it.falseStmt != null) {
             this.curScope = new BlockScope(this.curScope);
             this.curScope.parentScope.blockScopes.add(this.curScope);
-            it.elseScopeId = this.curScope.blockScopes.size() - 1;
+            it.elseScopeId = this.curScope.parentScope.blockScopes.size() - 1;
             it.falseStmt.accept(this);
             this.curScope = this.curScope.parentScope;
 //            this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
@@ -54,7 +54,7 @@ public class SemanticCheck implements ASTVisitor {
     public void visit(BlockStmtNode it) {
         this.curScope = new BlockScope(this.curScope);
         this.curScope.parentScope.blockScopes.add(this.curScope);
-        it.scopeId = this.curScope.blockScopes.size() - 1;
+        it.scopeId = this.curScope.parentScope.blockScopes.size() - 1;
         it.stmts.forEach(cur -> cur.accept(this));
         this.curScope = this.curScope.parentScope;
 //        this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);
@@ -102,7 +102,7 @@ public class SemanticCheck implements ASTVisitor {
     public void visit(ForStmtNode it) {
         this.curScope = new LoopScope(this.curScope);
         this.curScope.parentScope.blockScopes.add(this.curScope);
-        it.scopeId = this.curScope.blockScopes.size() - 1;
+        it.scopeId = this.curScope.parentScope.blockScopes.size() - 1;
         if (it.forInitStmt != null)
             it.forInitStmt.accept(this);
         if (it.condition != null) {
@@ -244,7 +244,7 @@ public class SemanticCheck implements ASTVisitor {
             throw new semanticError("while condition is not a bool expression", it.pos);
         this.curScope = new LoopScope(this.curScope);
         this.curScope.parentScope.blockScopes.add(this.curScope);
-        it.scopeId = this.curScope.blockScopes.size() - 1;
+        it.scopeId = this.curScope.parentScope.blockScopes.size() - 1;
         it.thenStmt.accept(this);
         this.curScope = this.curScope.parentScope;
 //        this.curScope.blockScopes.remove(this.curScope.blockScopes.size() - 1);

@@ -12,9 +12,9 @@ public class IRFunction {
     public ArrayList<IRType> parameterTypes;
     public ArrayList<String> parameterNames;
     public ArrayList<IRBlock> blocks;
-    public IRBlock entryBLock;
+    public IRBlock entryBlock;
     public IRBlock returnBlock;
-    public IRRegister thisPtr;
+    public IRRegister thisReg;
     public boolean declare;
 
     public IRFunction(String name) {
@@ -24,9 +24,9 @@ public class IRFunction {
         this.parameterTypes = new ArrayList<>();
         this.parameterNames = new ArrayList<>();
         this.blocks = new ArrayList<>();
-        this.entryBLock = new IRBlock(this, "entry");
+        this.entryBlock = new IRBlock(this, "entry");
         this.returnBlock = new IRBlock(this, "return");
-        this.thisPtr = null;
+        this.thisReg = null;
         this.declare = false;
     }
 
@@ -40,22 +40,23 @@ public class IRFunction {
         visitor.visit(this);
     }
 
-    String getParameterListToString() {
+    String getParameterListToString(boolean isDeclare) {
         StringBuilder builder = new StringBuilder();
         builder.append("(");
         for (int i = 0; i < parameterRegs.size(); i++) {
             if (i != 0) builder.append(", ");
-            builder.append(parameterTypes.get(i).toString());
+            builder.append(parameterTypes.get(i));
+            if (!isDeclare) builder.append(" " + parameterRegs.get(i));
         }
         builder.append(")");
         return builder.toString();
     }
 
-    public String getDeclare(){
-        return "declare " + returnType.toString() + " @" + name + getParameterListToString() + " #0";
+    public String getDeclare() {
+        return "declare " + returnType.toString() + " @" + name + getParameterListToString(true) + " #0";
     }
 
     public String getFuncPrefix() {
-        return "define " + returnType.toString() + " @" + name + getParameterListToString() + " #0 {";
+        return "define " + returnType.toString() + " @" + name + getParameterListToString(false) + " #0 {";
     }
 }

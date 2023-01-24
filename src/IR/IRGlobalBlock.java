@@ -17,7 +17,7 @@ public class IRGlobalBlock {
     public LinkedHashMap<String, IRGlobalDefine> irGlobalDefines;
 
     public int stringNum;
-    public IRFunction initFunction;
+//    public IRFunction initFunction;
 
     public static IRType boolType;
     public static IRType intType;
@@ -37,15 +37,15 @@ public class IRGlobalBlock {
         stringNum = 0;
 
         types.put("bool", boolType = new IRIntType(1));
-        types.put("char", intType = new IRIntType(8));
+        types.put("char", charType = new IRIntType(8));
         types.put("int", intType = new IRIntType(32));
         types.put("null", nullType = new IRNullType());
         types.put("void", voidType = new IRVoidType());
         types.put("string", stringType = new IRPointType(IRGlobalBlock.charType));
 
-        initFunction = new IRFunction("__init_function");
-        initFunction.returnType = IRGlobalBlock.voidType;
-        initFunction.blocks.add(initFunction.entryBLock);
+//        initFunction = new IRFunction("__init_function");
+//        initFunction.returnType = IRGlobalBlock.voidType;
+//        initFunction.blocks.add(initFunction.entryBlock);
     }
 
     public void addString(String str) {

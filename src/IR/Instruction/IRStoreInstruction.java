@@ -7,14 +7,14 @@ import IR.IRVisitor;
 
 public class IRStoreInstruction extends IRInstruction {
     public IRType storeType;
-    public IRValue storeFrom;
-    public IRValue storeTo;
+    public IRValue storeAddr;
+    public IRValue storeVal;
 
-    public IRStoreInstruction(IRType storeType, IRValue storeFrom, IRValue storeTo, IRBlock parentBlock) {
+    public IRStoreInstruction(IRType storeType, IRValue storeAddr, IRValue storeVal, IRBlock parentBlock) {
         super(parentBlock);
         this.storeType = storeType;
-        this.storeFrom = storeFrom;
-        this.storeTo = storeTo;
+        this.storeAddr = storeAddr;
+        this.storeVal = storeVal;
     }
 
     @Override
@@ -24,6 +24,6 @@ public class IRStoreInstruction extends IRInstruction {
 
     @Override
     public String toString() {
-        return "store " + storeType + " " + storeTo + ", " + storeType + "* " + storeFrom + ", align " + storeType.sizeof();
+        return "store " + storeType + " " + storeVal + ", " + storeType + "* " + storeAddr + ", align " + storeType.sizeof();
     }
 }

@@ -9,13 +9,13 @@ public class VarEntity extends Entity {
     public Type varType;
     public IRStructType classIRType;
     public int index;
-    public IRRegister register;
+    public IRRegister ptr;
 
     public VarEntity(Type varType, String name, Position pos) {
         super(name, pos);
         this.varType = varType;
         this.classIRType = null;
         this.index = -1;
-        this.register = null;
+        this.ptr = null;
     }
 }
