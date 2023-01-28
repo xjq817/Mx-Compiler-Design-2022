@@ -3,6 +3,7 @@ import Backend.ASMBuilder;
 import Backend.ASMPrinter;
 import Frontend.*;
 import IR.IRGlobalBlock;
+import Util.BuiltinFunctionASMPrinter;
 import Util.MxErrorListener;
 import Util.Scope.GlobalScope;
 import Util.error.error;
@@ -24,7 +25,7 @@ public class Compiler {
         //PrintStream iroutput = new PrintStream("test.ll");
         //PrintStream asmoutput = new PrintStream("test.s");
         InputStream input = System.in;
-        PrintStream asmoutput = System.out;
+        PrintStream asmoutput = new PrintStream("output.s");
         GlobalScope globalScope = new GlobalScope(null);
         IRGlobalBlock irGlobalBlock = new IRGlobalBlock();
         ASMGlobalBlock asmGlobalBlock = new ASMGlobalBlock();
@@ -52,6 +53,7 @@ public class Compiler {
             asmBuilder.visit(irGlobalBlock);
             ASMPrinter asmPrinter = new ASMPrinter(asmoutput);
             asmPrinter.visit(asmGlobalBlock);
+            BuiltinFunctionASMPrinter builtin_printer = new BuiltinFunctionASMPrinter("builtin.s");
         } catch (error er) {
             System.err.println(er.toString());
             throw new RuntimeException();
