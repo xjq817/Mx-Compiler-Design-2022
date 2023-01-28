@@ -3,7 +3,6 @@ package Frontend;
 import IR.IRBlock;
 import IR.IRFunction;
 import IR.IRGlobalBlock;
-import IR.IRValue.IRGlobalDefine;
 import IR.IRType.*;
 import IR.IRValue.*;
 import IR.Instruction.*;
@@ -53,7 +52,10 @@ public class IRBuilder implements ASTVisitor {
     }
 
     IRRegister getIdentifierPtr(IdentifierPrimaryNode it) {
-        VarEntity entity = curScope.getVarEntity(it.name);
+//        if (it.pos.row() == 53 && it.pos.col() == 7) {
+//            System.out.println("fuck");
+//        }
+        VarEntity entity = it.varEntity;
 
         //not in class: varEntity recorded the register
         if (entity.classIRType == null) return entity.ptr;
@@ -661,6 +663,9 @@ public class IRBuilder implements ASTVisitor {
     public void visit(IdentifierPrimaryNode it) {
         //only variable
         IRRegister identPtr = getIdentifierPtr(it);
+//        if (identPtr == null) {
+//            System.out.println("fuck");
+//        }
         IRType identType = ((IRPointType) identPtr.type).baseType;
         IRRegister identReg = new IRRegister(identType, "identifier_register");
         curBlock.instructions.add(new IRLoadInstruction(identReg, identType, identPtr, curBlock));

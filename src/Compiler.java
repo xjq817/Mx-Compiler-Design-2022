@@ -20,7 +20,7 @@ import java.io.PrintStream;
 
 public class Compiler {
     public static void main(String[] args) throws Exception {
-        //String name = "test.mx";
+        String name = "test.mx";
         //InputStream input = new FileInputStream(name);
         //PrintStream iroutput = new PrintStream("test.ll");
         //PrintStream asmoutput = new PrintStream("test.s");

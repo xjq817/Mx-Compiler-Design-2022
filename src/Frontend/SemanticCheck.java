@@ -487,6 +487,7 @@ public class SemanticCheck implements ASTVisitor {
             VarEntity varEntity = curScope.getVarEntity(it.name);
             if (varEntity == null) throw new semanticError("cannot find this var: " + it.name, it.pos);
             it.type = varEntity.varType;
+            it.varEntity = varEntity;
         } else if (it.isFunc) {
             FuncEntity funcEntity = curScope.getFuncEntity(it.name);
             if (funcEntity == null) throw new semanticError("cannot find this func: " + it.name, it.pos);
