@@ -17,7 +17,8 @@ public class IRIntType extends IRType {
 
     @Override
     public int sizeof() {
-        return 4;
+        if (bit == 1) return 4;
+        return (bit + 7) / 8;
     }
 
     @Override

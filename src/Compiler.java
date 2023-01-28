@@ -21,11 +21,11 @@ import java.io.PrintStream;
 public class Compiler {
     public static void main(String[] args) throws Exception {
         String name = "test.mx";
-        //InputStream input = new FileInputStream(name);
-        //PrintStream iroutput = new PrintStream("test.ll");
-        //PrintStream asmoutput = new PrintStream("test.s");
-        InputStream input = System.in;
-        PrintStream asmoutput = new PrintStream("output.s");
+        InputStream input = new FileInputStream(name);
+        PrintStream iroutput = new PrintStream("test.ll");
+        PrintStream asmoutput = new PrintStream("test.s");
+        //InputStream input = System.in;
+        //PrintStream asmoutput = new PrintStream("output.s");
         GlobalScope globalScope = new GlobalScope(null);
         IRGlobalBlock irGlobalBlock = new IRGlobalBlock();
         ASMGlobalBlock asmGlobalBlock = new ASMGlobalBlock();
@@ -47,13 +47,13 @@ public class Compiler {
             stringCollector.visit(ASTRoot);
             IRBuilder irBuilder = new IRBuilder(globalScope, irGlobalBlock);
             irBuilder.visit(ASTRoot);
-            //IRPrinter irPrinter = new IRPrinter(iroutput);
-            //irPrinter.visit(irGlobalBlock);
+            IRPrinter irPrinter = new IRPrinter(iroutput);
+            irPrinter.visit(irGlobalBlock);
             ASMBuilder asmBuilder = new ASMBuilder(asmGlobalBlock);
             asmBuilder.visit(irGlobalBlock);
             ASMPrinter asmPrinter = new ASMPrinter(asmoutput);
             asmPrinter.visit(asmGlobalBlock);
-            BuiltinFunctionASMPrinter builtin_printer = new BuiltinFunctionASMPrinter("builtin.s");
+            //BuiltinFunctionASMPrinter builtin_printer = new BuiltinFunctionASMPrinter("builtin.s");
         } catch (error er) {
             System.err.println(er.toString());
             throw new RuntimeException();
