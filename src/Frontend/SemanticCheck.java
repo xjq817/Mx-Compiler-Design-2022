@@ -148,8 +148,8 @@ public class SemanticCheck implements ASTVisitor {
     @Override
     public void visit(ClassDefNode it) {
         this.curScope = this.gScope.types.get(it.name.name).classScope;
-        it.constructions.forEach(cur -> cur.accept(this));
         it.variables.forEach(cur -> cur.accept(this));
+        it.constructions.forEach(cur -> cur.accept(this));
         it.functions.forEach(cur -> cur.accept(this));
         this.curScope = this.curScope.parentScope;
     }
@@ -488,6 +488,9 @@ public class SemanticCheck implements ASTVisitor {
             if (varEntity == null) throw new semanticError("cannot find this var: " + it.name, it.pos);
             it.type = varEntity.varType;
             it.varEntity = varEntity;
+//            if (it.pos.row() == 31 && it.pos.col() == 2) {
+//                System.out.println("fuck");
+//            }
         } else if (it.isFunc) {
             FuncEntity funcEntity = curScope.getFuncEntity(it.name);
             if (funcEntity == null) throw new semanticError("cannot find this func: " + it.name, it.pos);

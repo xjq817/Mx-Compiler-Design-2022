@@ -52,7 +52,7 @@ public class IRBuilder implements ASTVisitor {
     }
 
     IRRegister getIdentifierPtr(IdentifierPrimaryNode it) {
-//        if (it.pos.row() == 53 && it.pos.col() == 7) {
+//        if (it.pos.row() == 31 && it.pos.col() == 2) {
 //            System.out.println("fuck");
 //        }
         VarEntity entity = it.varEntity;
@@ -108,6 +108,16 @@ public class IRBuilder implements ASTVisitor {
                 IRStructType classType = (IRStructType) gBlock.types.get(className);
                 Type classTypeInScope = gScope.types.get(className);
 
+                ((ClassDefNode) cur).variables.forEach(vars -> {
+                    IRType varType = vars.type.transType(gScope).toIRType(gBlock);
+                    vars.variables.forEach(var -> {
+                        classType.addMember(var.name.name, varType);
+                        VarEntity varEntity = classTypeInScope.classScope.varEntities.get(var.name.name);
+                        varEntity.classIRType = classType;
+                        varEntity.index = classType.memberNumber - 1;
+                    });
+                });
+
                 if (((ClassDefNode) cur).constructions.size() > 0) {
                     //create a construction irfunction: class.__cons(thisPtr){...}
                     IRFunction construction = new IRFunction(className + ".__cons");
@@ -136,16 +146,6 @@ public class IRBuilder implements ASTVisitor {
                     });
                     gBlock.addFunction(function);
                     classTypeInScope.classScope.funcEntities.get(func.name.name).irFunction = function;
-                });
-
-                ((ClassDefNode) cur).variables.forEach(vars -> {
-                    IRType varType = vars.type.transType(gScope).toIRType(gBlock);
-                    vars.variables.forEach(var -> {
-                        classType.addMember(var.name.name, varType);
-                        VarEntity varEntity = classTypeInScope.classScope.varEntities.get(var.name.name);
-                        varEntity.classIRType = classType;
-                        varEntity.index = classType.memberNumber - 1;
-                    });
                 });
             }
         });
