@@ -4,6 +4,7 @@ import IR.IRValue.IRInitial;
 import IR.IRValue.IRValue;
 import IR.IRVisitor;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -11,6 +12,7 @@ public class IRStructType extends IRType {
     public String className;
     public LinkedHashMap<String, IRType> memberTypes;
     public LinkedHashMap<String, Integer> memberIds;
+    public ArrayList<IRType> typeList;
     public int memberNumber;
 
     public IRStructType(String className) {
@@ -18,11 +20,13 @@ public class IRStructType extends IRType {
         memberTypes = new LinkedHashMap<>();
         memberIds = new LinkedHashMap<>();
         memberNumber = 0;
+        typeList = new ArrayList<>();
     }
 
     public void addMember(String memberName, IRType memberType) {
         memberTypes.put(memberName, memberType);
         memberIds.put(memberName, memberNumber++);
+        typeList.add(memberType);
     }
 
     @Override

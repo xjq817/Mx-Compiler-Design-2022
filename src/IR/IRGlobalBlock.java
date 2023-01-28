@@ -2,6 +2,7 @@ package IR;
 
 import IR.IRType.*;
 import IR.IRValue.IRConstString;
+import IR.IRValue.IRGlobalDefine;
 import Util.Scope.GlobalScope;
 import Util.error.IRError;
 
@@ -13,11 +14,11 @@ public class IRGlobalBlock {
     public LinkedHashMap<String, IRFunction> functions;
     public LinkedHashMap<String, IRConstString> strings;
     public ArrayList<IRStructType> classTypes;
-    public ArrayList<IRFunction> singleInitFunctions;
+    //public ArrayList<IRFunction> singleInitFunctions;
+    int singleInitFuncNum;
     public LinkedHashMap<String, IRGlobalDefine> irGlobalDefines;
 
     public int stringNum;
-//    public IRFunction initFunction;
 
     public static IRType boolType;
     public static IRType intType;
@@ -31,10 +32,11 @@ public class IRGlobalBlock {
         functions = new LinkedHashMap<>();
         strings = new LinkedHashMap<>();
         classTypes = new ArrayList<>();
-        singleInitFunctions = new ArrayList<>();
+        //singleInitFunctions = new ArrayList<>();
         irGlobalDefines = new LinkedHashMap<>();
 
         stringNum = 0;
+        singleInitFuncNum = 0;
 
         types.put("bool", boolType = new IRIntType(1));
         types.put("char", charType = new IRIntType(8));
@@ -43,9 +45,6 @@ public class IRGlobalBlock {
         types.put("void", voidType = new IRVoidType());
         types.put("string", stringType = new IRPointType(IRGlobalBlock.charType));
 
-//        initFunction = new IRFunction("__init_function");
-//        initFunction.returnType = IRGlobalBlock.voidType;
-//        initFunction.blocks.add(initFunction.entryBlock);
     }
 
     public void addString(String str) {
@@ -191,10 +190,11 @@ public class IRGlobalBlock {
     }
 
     public IRFunction newSingleInitFunction() {
-        String name = "__global_init_" + singleInitFunctions.size();
+        String name = "__global_init_" + singleInitFuncNum;
         IRFunction function = new IRFunction(name);
         function.returnType = IRGlobalBlock.voidType;
-        singleInitFunctions.add(function);
+        singleInitFuncNum = singleInitFuncNum + 1;
+        functions.put(name, function);
         return function;
     }
 

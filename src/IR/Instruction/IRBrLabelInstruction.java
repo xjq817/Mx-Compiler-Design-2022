@@ -18,6 +18,6 @@ public class IRBrLabelInstruction extends IRInstruction {
 
     @Override
     public String toString() {
-        return "br label " + toBlock.label;
+        return "br label %" + toBlock.label;
     }
 }

@@ -3,7 +3,7 @@ package Frontend;
 import IR.IRBlock;
 import IR.IRFunction;
 import IR.IRGlobalBlock;
-import IR.IRGlobalDefine;
+import IR.IRValue.IRGlobalDefine;
 import IR.IRType.*;
 import IR.IRValue.*;
 import IR.Instruction.*;
@@ -88,7 +88,7 @@ public class IRBuilder implements ASTVisitor {
         //   for variables, we need to add to classIRType
         //3. add functions' parameters
         //4. accept varDefNode to solve globalDefine
-        //5. accept classes and functions
+        //5. accept classes and functions to solve details
         it.defs.forEach(cur -> {
             if (cur instanceof ClassDefNode) {
                 String className = ((ClassDefNode) cur).name.name;
@@ -384,6 +384,7 @@ public class IRBuilder implements ASTVisitor {
 
         Type intType = this.gScope.types.get("int");
         Type boolType = this.gScope.types.get("bool");
+        Type stringType = this.gScope.types.get("string");
         IRType type = it.type.toIRType(gBlock);
 
         IRRegister reg = new IRRegister(type, "res");
@@ -412,12 +413,7 @@ public class IRBuilder implements ASTVisitor {
                     else if (Objects.equals(it.op, "!=")) op = "ne";
                     curBlock.instructions.add(new IRIcmpInstruction(op, reg, lhsReg, rhsReg, curBlock));
                     it.register = reg;
-                } else if (it.lhs.type.isEqual(boolType)) {
-                    if (Objects.equals(it.op, "==")) op = "eq";
-                    else if (Objects.equals(it.op, "!=")) op = "ne";
-                    curBlock.instructions.add(new IRIcmpInstruction(op, reg, lhsReg, rhsReg, curBlock));
-                    it.register = reg;
-                } else {
+                } else if (it.lhs.type.isEqual(stringType)) {
                     //string compare need builtin function
                     IRFunction cmpFunction = null;
                     IRRegister regRet = new IRRegister(IRGlobalBlock.charType, "res_char");
@@ -434,6 +430,12 @@ public class IRBuilder implements ASTVisitor {
                     IRRegister regRes = new IRRegister(IRGlobalBlock.boolType, "res_bool");
                     curBlock.instructions.add(new IRTruncInstruction(regRes, regRet, IRGlobalBlock.boolType, curBlock));
                     it.register = regRes;
+                } else {
+                    //contain bool and null
+                    if (Objects.equals(it.op, "==")) op = "eq";
+                    else if (Objects.equals(it.op, "!=")) op = "ne";
+                    curBlock.instructions.add(new IRIcmpInstruction(op, reg, lhsReg, rhsReg, curBlock));
+                    it.register = reg;
                 }
             }
         } else {

@@ -2,6 +2,7 @@ package IR;
 
 import IR.IRType.IRStructType;
 import IR.IRValue.IRConstString;
+import IR.IRValue.IRGlobalDefine;
 import IR.Instruction.*;
 
 public interface IRVisitor {

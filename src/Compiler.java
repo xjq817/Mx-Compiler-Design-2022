@@ -1,3 +1,6 @@
+import ASM.ASMGlobalBlock;
+import Backend.ASMBuilder;
+import Backend.ASMPrinter;
 import Frontend.*;
 import IR.IRGlobalBlock;
 import Util.MxErrorListener;
@@ -16,12 +19,15 @@ import java.io.PrintStream;
 
 public class Compiler {
     public static void main(String[] args) throws Exception {
-        String name = "test.mx";
-        InputStream input = new FileInputStream(name);
-        PrintStream output = new PrintStream("test.ll");
-//        InputStream input = System.in;
+        //String name = "test.mx";
+        //InputStream input = new FileInputStream(name);
+        //PrintStream iroutput = new PrintStream("test.ll");
+        //PrintStream asmoutput = new PrintStream("test.s");
+        InputStream input = System.in;
+        PrintStream asmoutput = System.out;
         GlobalScope globalScope = new GlobalScope(null);
-        IRGlobalBlock globalBlock = new IRGlobalBlock();
+        IRGlobalBlock irGlobalBlock = new IRGlobalBlock();
+        ASMGlobalBlock asmGlobalBlock = new ASMGlobalBlock();
         try {
             MxLexer lexer = new MxLexer(CharStreams.fromStream(input));
             lexer.removeErrorListeners();
@@ -36,12 +42,16 @@ public class Compiler {
             symbolCollector.visit(ASTRoot);
             SemanticCheck semanticCheck = new SemanticCheck(globalScope);
             semanticCheck.visit(ASTRoot);
-            StringCollector stringCollector = new StringCollector(globalBlock);
+            StringCollector stringCollector = new StringCollector(irGlobalBlock);
             stringCollector.visit(ASTRoot);
-            IRBuilder irBuilder = new IRBuilder(globalScope, globalBlock);
+            IRBuilder irBuilder = new IRBuilder(globalScope, irGlobalBlock);
             irBuilder.visit(ASTRoot);
-            IRPrinter irPrinter = new IRPrinter(output);
-            irPrinter.visit(globalBlock);
+            //IRPrinter irPrinter = new IRPrinter(iroutput);
+            //irPrinter.visit(irGlobalBlock);
+            ASMBuilder asmBuilder = new ASMBuilder(asmGlobalBlock);
+            asmBuilder.visit(irGlobalBlock);
+            ASMPrinter asmPrinter = new ASMPrinter(asmoutput);
+            asmPrinter.visit(asmGlobalBlock);
         } catch (error er) {
             System.err.println(er.toString());
             throw new RuntimeException();

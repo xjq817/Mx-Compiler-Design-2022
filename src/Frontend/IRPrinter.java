@@ -1,8 +1,12 @@
 package Frontend;
 
-import IR.*;
+import IR.IRBlock;
+import IR.IRFunction;
+import IR.IRGlobalBlock;
 import IR.IRType.IRStructType;
 import IR.IRValue.IRConstString;
+import IR.IRValue.IRGlobalDefine;
+import IR.IRVisitor;
 import IR.Instruction.*;
 
 import java.io.PrintStream;
@@ -91,8 +95,8 @@ public class IRPrinter implements IRVisitor {
         ps.println();
         it.irGlobalDefines.forEach((name, cur) -> cur.accept(this));
         ps.println();
-        it.singleInitFunctions.forEach(cur -> cur.accept(this));
-        ps.println();
+        //it.singleInitFunctions.forEach(cur -> cur.accept(this));
+        //ps.println();
         it.functions.forEach((name, func) -> {
             if (!func.declare) func.accept(this);
         });
@@ -100,7 +104,7 @@ public class IRPrinter implements IRVisitor {
 
     @Override
     public void visit(IRBlock it) {
-        ps.println(it.label.irPrint());
+        ps.println(it.label + ":");
         it.instructions.forEach(cur -> {
             ps.print("\t");
             cur.accept(this);

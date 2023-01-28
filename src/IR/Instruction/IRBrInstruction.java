@@ -23,6 +23,6 @@ public class IRBrInstruction extends IRInstruction {
 
     @Override
     public String toString() {
-        return "br " + condition.type + " " + condition + ", label " + thenBlock.label + ", label " + elseBlock.label;
+        return "br " + condition.type + " " + condition + ", label %" + thenBlock.label + ", label %" + elseBlock.label;
     }
 }
