@@ -60,17 +60,24 @@ public class ASMBuilder implements IRVisitor {
         if (value instanceof IRRegister) {
             IRRegister reg = (IRRegister) value;
             if (reg.isGlobal) {
+                if (curFunction.globalVars.containsKey(((IRRegister) value).name))
+                    return curFunction.globalVars.get(((IRRegister) value).name);
                 ASMVirtualRegister virtualReg = new ASMVirtualRegister("global_define");
                 curBlock.instructions.add(new ASMLaInstruction(reg.name, virtualReg, curBlock));
-                value.virtualReg = virtualReg;
+                curFunction.globalVars.put(((IRRegister) value).name, virtualReg);
+                return virtualReg;
             }
             if (value.virtualReg != null) return value.virtualReg;
             value.virtualReg = new ASMVirtualRegister(reg.toString());
             return value.virtualReg;
         }
         if (value instanceof IRConstString) {
+            String name = "str." + ((IRConstString) value).id;
+            if (curFunction.constStrings.containsKey(name))
+                return curFunction.constStrings.get(name);
             ASMVirtualRegister virtualReg = new ASMVirtualRegister("str_addr");
-            curBlock.instructions.add(new ASMLaInstruction("str." + ((IRConstString) value).id, virtualReg, curBlock));
+            curBlock.instructions.add(new ASMLaInstruction(name, virtualReg, curBlock));
+            curFunction.constStrings.put(name, virtualReg);
             return virtualReg;
         }
         ASMVirtualRegister virtualReg = new ASMVirtualRegister("const");
@@ -193,11 +200,16 @@ public class ASMBuilder implements IRVisitor {
         rd = transVReg(it.register);
         rs1 = transVReg(it.ptrValue);
         if (it.values.size() == 1) {
-            rs2 = transVReg(it.values.get(0));
-            tmp = new ASMVirtualRegister("tmp");
-            curBlock.instructions.add(new ASMLiInstruction(tmp, new ASMImm(it.typeFrom.sizeof()), curBlock));
-            curBlock.instructions.add(new ASMBinaryInstruction("mul", null, tmp, tmp, rs2, curBlock));
-            curBlock.instructions.add(new ASMBinaryInstruction("add", null, rd, rs1, tmp, curBlock));
+            if (it.values.get(0) instanceof IRConstInt) {
+                int offset = ((IRConstInt) it.values.get(0)).value * it.typeFrom.sizeof();
+                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(offset), rd, rs1, null, curBlock));
+            } else {
+                rs2 = transVReg(it.values.get(0));
+                tmp = new ASMVirtualRegister("tmp");
+                curBlock.instructions.add(new ASMLiInstruction(tmp, new ASMImm(it.typeFrom.sizeof()), curBlock));
+                curBlock.instructions.add(new ASMBinaryInstruction("mul", null, tmp, tmp, rs2, curBlock));
+                curBlock.instructions.add(new ASMBinaryInstruction("add", null, rd, rs1, tmp, curBlock));
+            }
         } else {
             //the first value must be 0
             int id = ((IRConstInt) it.values.get(1)).value;
@@ -266,7 +278,6 @@ public class ASMBuilder implements IRVisitor {
         it.functions.forEach((name, func) -> {
             if (!func.declare) {
                 curFunction = gBlock.functions.get(name);
-                //System.out.println(name + ":: " + curFunction.allocSize);
                 curFunction.blocks.forEach(cur -> {
                     curBlock = cur;
                     newInst = new ArrayList<>();
@@ -303,8 +314,6 @@ public class ASMBuilder implements IRVisitor {
                     curBlock = cur;
                     newInst = new ArrayList<>();
                     cur.instructions.forEach(inst -> {
-//                        if (inst.imm!=null)
-//                            System.out.println(inst.imm.imm);
                         if (inst instanceof ASMBinaryInstruction
                                 && Objects.equals(((ASMBinaryInstruction) inst).op, "addi")
                                 && !checkImm(inst.imm.imm)) {
