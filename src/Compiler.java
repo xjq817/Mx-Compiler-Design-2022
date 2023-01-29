@@ -14,14 +14,12 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 
 public class Compiler {
     public static void main(String[] args) throws Exception {
-        String name = "test.mx";
-        //InputStream input = new FileInputStream(name);
+        //InputStream input = new FileInputStream("test.mx");
         //PrintStream iroutput = new PrintStream("test.ll");
         //PrintStream asmoutput = new PrintStream("test.s");
         InputStream input = System.in;

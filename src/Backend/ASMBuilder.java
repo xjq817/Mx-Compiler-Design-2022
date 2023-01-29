@@ -24,7 +24,7 @@ public class ASMBuilder implements IRVisitor {
     public ASMGlobalBlock gBlock;
     public ASMFunction curFunction;
 
-    int parameterSize = 2;
+    int parameterSize = 3;
 
     ASMPhysicalRegister sp = new ASMPhysicalRegister("sp");
     ASMPhysicalRegister s0 = new ASMPhysicalRegister("s0");
