@@ -42,7 +42,6 @@ public class ASMBuilder implements IRVisitor {
     }
 
     void funcAlloc(ASMVirtualRegister reg) {
-        //System.out.println("alloc:"+curFunction.name+" "+curFunction.allocSize);
         reg.isAlloc = true;
         reg.offset = curFunction.allocSize;
         curFunction.allocSize += 4;
@@ -231,7 +230,6 @@ public class ASMBuilder implements IRVisitor {
     void stackLoad(ASMVirtualRegister reg, ASMPhysicalRegister t) {
         if (!reg.isAlloc) funcAlloc(reg);
         ASMImm imm = new ASMImm(reg.offset);
-        //System.out.println(curFunction.name + " " + reg.offset);
         if (checkImm(reg.offset))
             newInst.add(new ASMLoadInstruction(4, t, sp, imm, curBlock));
         else {
@@ -296,7 +294,6 @@ public class ASMBuilder implements IRVisitor {
             if (!func.declare) {
                 curFunction = gBlock.functions.get(name);
                 int size = curFunction.allocSize + curFunction.parameterSize;
-                //System.out.println(name + ": " + curFunction.allocSize + " " + curFunction.parameterSize);
                 curBlock = curFunction.entryBlock;
                 curBlock.instructions.get(0).imm.imm = -size;
                 curBlock.instructions.get(3).imm.imm = size;
@@ -348,7 +345,6 @@ public class ASMBuilder implements IRVisitor {
                         if (i == parameterSize)
                             curBlock.instructions.add(new ASMLoadInstruction(4, virS0, sp, new ASMImm(0), curBlock));
                         curBlock.instructions.add(new ASMLoadInstruction(4, rd, virS0, new ASMImm(-4 * (i + 1 - parameterSize)), curBlock));
-                        //curFunction.parameterSize += 4;
                     }
                 }
             }

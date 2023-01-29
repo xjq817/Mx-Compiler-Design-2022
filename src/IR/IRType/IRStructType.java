@@ -38,9 +38,10 @@ public class IRStructType extends IRType {
     public int sizeof() {
         AtomicInteger sum = new AtomicInteger();
         memberTypes.forEach((name, type) -> sum.addAndGet(type.sizeof()));
-        int size = 1;
-        while (size < sum.get()) size <<= 1;
-        return size;
+        return sum.get();
+//        int size = 1;
+//        while (size < sum.get()) size <<= 1;
+//        return size;
     }
 
     public void accept(IRVisitor visitor) {
