@@ -90,106 +90,110 @@ point.__cons:
 
 point.set:
 .point.set.entry:
-	addi	sp,	sp,	-128
+	addi	sp,	sp,	-132
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
-	addi	s0,	sp,	128
+	addi	s0,	sp,	132
 	mv		t0,	a0
 	sw		t0,	24(sp)
 	mv		t0,	a1
 	sw		t0,	28(sp)
-	mv		t0,	a2
+	lw		t0,	0(sp)
 	sw		t0,	32(sp)
-	mv		t0,	a3
+	lw		t1,	32(sp)
+	lw		t0,	-4(t1)
 	sw		t0,	36(sp)
-	addi	t0,	sp,	8
+	lw		t1,	32(sp)
+	lw		t0,	-8(t1)
 	sw		t0,	40(sp)
-	addi	t0,	sp,	12
+	addi	t0,	sp,	8
 	sw		t0,	44(sp)
-	addi	t0,	sp,	16
+	addi	t0,	sp,	12
 	sw		t0,	48(sp)
-	addi	t0,	sp,	20
+	addi	t0,	sp,	16
 	sw		t0,	52(sp)
+	addi	t0,	sp,	20
+	sw		t0,	56(sp)
 	lw		t1,	24(sp)
-	lw		t2,	40(sp)
-	sw		t1,	0(t2)
-	lw		t1,	28(sp)
 	lw		t2,	44(sp)
 	sw		t1,	0(t2)
-	lw		t1,	32(sp)
+	lw		t1,	28(sp)
 	lw		t2,	48(sp)
 	sw		t1,	0(t2)
 	lw		t1,	36(sp)
 	lw		t2,	52(sp)
 	sw		t1,	0(t2)
 	lw		t1,	40(sp)
-	lw		t0,	0(t1)
-	sw		t0,	56(sp)
-	lw		t1,	56(sp)
-	addi	t0,	t1,	0
-	sw		t0,	60(sp)
-	lw		t1,	60(sp)
-	lw		t0,	0(t1)
-	sw		t0,	64(sp)
+	lw		t2,	56(sp)
+	sw		t1,	0(t2)
 	lw		t1,	44(sp)
 	lw		t0,	0(t1)
-	sw		t0,	68(sp)
-	lw		t1,	40(sp)
-	lw		t0,	0(t1)
-	sw		t0,	72(sp)
-	lw		t1,	72(sp)
+	sw		t0,	60(sp)
+	lw		t1,	60(sp)
 	addi	t0,	t1,	0
-	sw		t0,	76(sp)
-	lw		t1,	68(sp)
-	lw		t2,	76(sp)
-	sw		t1,	0(t2)
-	lw		t1,	40(sp)
+	sw		t0,	64(sp)
+	lw		t1,	64(sp)
 	lw		t0,	0(t1)
-	sw		t0,	80(sp)
-	lw		t1,	80(sp)
-	addi	t0,	t1,	4
-	sw		t0,	84(sp)
-	lw		t1,	84(sp)
-	lw		t0,	0(t1)
-	sw		t0,	88(sp)
+	sw		t0,	68(sp)
 	lw		t1,	48(sp)
 	lw		t0,	0(t1)
-	sw		t0,	92(sp)
-	lw		t1,	40(sp)
+	sw		t0,	72(sp)
+	lw		t1,	44(sp)
 	lw		t0,	0(t1)
-	sw		t0,	96(sp)
-	lw		t1,	96(sp)
-	addi	t0,	t1,	4
-	sw		t0,	100(sp)
-	lw		t1,	92(sp)
-	lw		t2,	100(sp)
+	sw		t0,	76(sp)
+	lw		t1,	76(sp)
+	addi	t0,	t1,	0
+	sw		t0,	80(sp)
+	lw		t1,	72(sp)
+	lw		t2,	80(sp)
 	sw		t1,	0(t2)
-	lw		t1,	40(sp)
+	lw		t1,	44(sp)
 	lw		t0,	0(t1)
-	sw		t0,	104(sp)
-	lw		t1,	104(sp)
-	addi	t0,	t1,	8
-	sw		t0,	108(sp)
-	lw		t1,	108(sp)
+	sw		t0,	84(sp)
+	lw		t1,	84(sp)
+	addi	t0,	t1,	4
+	sw		t0,	88(sp)
+	lw		t1,	88(sp)
 	lw		t0,	0(t1)
-	sw		t0,	112(sp)
+	sw		t0,	92(sp)
 	lw		t1,	52(sp)
 	lw		t0,	0(t1)
+	sw		t0,	96(sp)
+	lw		t1,	44(sp)
+	lw		t0,	0(t1)
+	sw		t0,	100(sp)
+	lw		t1,	100(sp)
+	addi	t0,	t1,	4
+	sw		t0,	104(sp)
+	lw		t1,	96(sp)
+	lw		t2,	104(sp)
+	sw		t1,	0(t2)
+	lw		t1,	44(sp)
+	lw		t0,	0(t1)
+	sw		t0,	108(sp)
+	lw		t1,	108(sp)
+	addi	t0,	t1,	8
+	sw		t0,	112(sp)
+	lw		t1,	112(sp)
+	lw		t0,	0(t1)
 	sw		t0,	116(sp)
-	lw		t1,	40(sp)
+	lw		t1,	56(sp)
 	lw		t0,	0(t1)
 	sw		t0,	120(sp)
-	lw		t1,	120(sp)
-	addi	t0,	t1,	8
+	lw		t1,	44(sp)
+	lw		t0,	0(t1)
 	sw		t0,	124(sp)
-	lw		t1,	116(sp)
-	lw		t2,	124(sp)
+	lw		t1,	124(sp)
+	addi	t0,	t1,	8
+	sw		t0,	128(sp)
+	lw		t1,	120(sp)
+	lw		t2,	128(sp)
 	sw		t1,	0(t2)
 	j		.point.set.return
 .point.set.return:
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
-	addi	sp,	sp,	128
+	addi	sp,	sp,	132
 	ret
 	.size	point.set,	.-point.set
 
@@ -618,10 +622,10 @@ point.dot:
 
 point.cross:
 .point.cross.entry:
-	addi	sp,	sp,	-252
+	addi	sp,	sp,	-260
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
-	addi	s0,	sp,	252
+	addi	s0,	sp,	260
 	mv		t0,	a0
 	sw		t0,	24(sp)
 	mv		t0,	a1
@@ -808,9 +812,9 @@ point.cross:
 	lw		t1,	120(sp)
 	mv		a1,	t1
 	lw		t1,	180(sp)
-	mv		a2,	t1
+	sw		t1,	-4(s0)
 	lw		t1,	240(sp)
-	mv		a3,	t1
+	sw		t1,	-8(s0)
 	call	point.set
 	lw		t1,	44(sp)
 	lw		t0,	0(t1)
@@ -827,7 +831,7 @@ point.cross:
 	mv		a0,	t1
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
-	addi	sp,	sp,	252
+	addi	sp,	sp,	260
 	ret
 	.size	point.cross,	.-point.cross
 
@@ -1287,10 +1291,10 @@ point.printPoint:
 
 main:
 .main.entry:
-	addi	sp,	sp,	-496
+	addi	sp,	sp,	-504
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
-	addi	s0,	sp,	496
+	addi	s0,	sp,	504
 	addi	t0,	sp,	8
 	sw		t0,	28(sp)
 	li		t0,	0
@@ -1394,11 +1398,11 @@ main:
 	lw		t1,	120(sp)
 	mv		a1,	t1
 	lw		t1,	116(sp)
-	mv		a2,	t1
+	sw		t1,	-4(s0)
 	li		t0,	480
 	sw		t0,	124(sp)
 	lw		t1,	124(sp)
-	mv		a3,	t1
+	sw		t1,	-8(s0)
 	call	point.set
 	lw		t1,	52(sp)
 	lw		t0,	0(t1)
@@ -1426,9 +1430,9 @@ main:
 	li		t0,	585
 	sw		t0,	156(sp)
 	lw		t1,	156(sp)
-	mv		a2,	t1
+	sw		t1,	-4(s0)
 	lw		t1,	152(sp)
-	mv		a3,	t1
+	sw		t1,	-8(s0)
 	call	point.set
 	lw		t1,	68(sp)
 	lw		t0,	0(t1)
@@ -1456,9 +1460,9 @@ main:
 	lw		t1,	188(sp)
 	mv		a1,	t1
 	lw		t1,	172(sp)
-	mv		a2,	t1
+	sw		t1,	-4(s0)
 	lw		t1,	184(sp)
-	mv		a3,	t1
+	sw		t1,	-8(s0)
 	call	point.set
 	lw		t1,	84(sp)
 	lw		t0,	0(t1)
@@ -1492,9 +1496,9 @@ main:
 	lw		t1,	204(sp)
 	mv		a1,	t1
 	lw		t1,	216(sp)
-	mv		a2,	t1
+	sw		t1,	-4(s0)
 	lw		t1,	228(sp)
-	mv		a3,	t1
+	sw		t1,	-8(s0)
 	call	point.set
 	lw		t1,	36(sp)
 	lw		t0,	0(t1)
@@ -1814,7 +1818,7 @@ main:
 	mv		a0,	t1
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
-	addi	sp,	sp,	496
+	addi	sp,	sp,	504
 	ret
 	.size	main,	.-main
 

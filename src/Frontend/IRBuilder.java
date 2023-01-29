@@ -663,9 +663,6 @@ public class IRBuilder implements ASTVisitor {
     public void visit(IdentifierPrimaryNode it) {
         //only variable
         IRRegister identPtr = getIdentifierPtr(it);
-//        if (identPtr == null) {
-//            System.out.println("fuck");
-//        }
         IRType identType = ((IRPointType) identPtr.type).baseType;
         IRRegister identReg = new IRRegister(identType, "identifier_register");
         curBlock.instructions.add(new IRLoadInstruction(identReg, identType, identPtr, curBlock));

@@ -24,7 +24,7 @@ public class ASMBuilder implements IRVisitor {
     public ASMGlobalBlock gBlock;
     public ASMFunction curFunction;
 
-    int parameterSize = 8;
+    int parameterSize = 2;
 
     ASMPhysicalRegister sp = new ASMPhysicalRegister("sp");
     ASMPhysicalRegister s0 = new ASMPhysicalRegister("s0");
@@ -107,6 +107,8 @@ public class ASMBuilder implements IRVisitor {
             else
                 curBlock.instructions.add(new ASMStoreInstruction(4, virtualReg, s0, new ASMImm(-4 * (i + 1 - parameterSize)), curBlock));
         }
+        if ((it.argumentValues.size() - parameterSize) * 4 > curFunction.parameterSize)
+            curFunction.parameterSize = (it.argumentValues.size() - parameterSize) * 4;
         curBlock.instructions.add(new ASMCallInstruction(it.function.name, curBlock));
         if (!(it.type instanceof IRVoidType))
             curBlock.instructions.add(new ASMMvInstruction(transVReg(it.register), a0, curBlock));
@@ -337,14 +339,16 @@ public class ASMBuilder implements IRVisitor {
                 curBlock.instructions.add(new ASMStoreInstruction(4, s0, sp, new ASMImm(0), curBlock));
                 curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), s0, sp, null, curBlock));
                 //parameter
-
+                ASMVirtualRegister virS0 = new ASMVirtualRegister("vir_s0");
                 for (int i = 0; i < it.parameterRegs.size(); i++) {
                     ASMVirtualRegister rd = transVReg(it.parameterRegs.get(i));
                     if (i < parameterSize)
                         curBlock.instructions.add(new ASMMvInstruction(rd, new ASMPhysicalRegister("a" + i), curBlock));
                     else {
-                        curBlock.instructions.add(new ASMLoadInstruction(4, rd, s0, new ASMImm(-4 * (i + 1 - parameterSize)), curBlock));
-                        curFunction.parameterSize += 4;
+                        if (i == parameterSize)
+                            curBlock.instructions.add(new ASMLoadInstruction(4, virS0, sp, new ASMImm(0), curBlock));
+                        curBlock.instructions.add(new ASMLoadInstruction(4, rd, virS0, new ASMImm(-4 * (i + 1 - parameterSize)), curBlock));
+                        //curFunction.parameterSize += 4;
                     }
                 }
             }
