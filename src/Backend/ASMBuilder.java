@@ -60,11 +60,8 @@ public class ASMBuilder implements IRVisitor {
         if (value instanceof IRRegister) {
             IRRegister reg = (IRRegister) value;
             if (reg.isGlobal) {
-                if (curFunction.globalVars.containsKey(((IRRegister) value).name))
-                    return curFunction.globalVars.get(((IRRegister) value).name);
                 ASMVirtualRegister virtualReg = new ASMVirtualRegister("global_define");
                 curBlock.instructions.add(new ASMLaInstruction(reg.name, virtualReg, curBlock));
-                curFunction.globalVars.put(((IRRegister) value).name, virtualReg);
                 return virtualReg;
             }
             if (value.virtualReg != null) return value.virtualReg;
@@ -73,11 +70,8 @@ public class ASMBuilder implements IRVisitor {
         }
         if (value instanceof IRConstString) {
             String name = "str." + ((IRConstString) value).id;
-            if (curFunction.constStrings.containsKey(name))
-                return curFunction.constStrings.get(name);
             ASMVirtualRegister virtualReg = new ASMVirtualRegister("str_addr");
             curBlock.instructions.add(new ASMLaInstruction(name, virtualReg, curBlock));
-            curFunction.constStrings.put(name, virtualReg);
             return virtualReg;
         }
         ASMVirtualRegister virtualReg = new ASMVirtualRegister("const");

@@ -12,8 +12,6 @@ public class ASMFunction {
     public ASMBlock returnBlock;
     public int allocSize;
     public int parameterSize;
-    public LinkedHashMap<String, ASMVirtualRegister> globalVars;
-    public LinkedHashMap<String, ASMVirtualRegister> constStrings;
 
     public ASMFunction(String name) {
         this.name = name;
@@ -22,8 +20,6 @@ public class ASMFunction {
         this.returnBlock = null;
         this.allocSize = 8;
         this.parameterSize = 0;
-        this.globalVars = new LinkedHashMap<>();
-        this.constStrings = new LinkedHashMap<>();
     }
 
     public void accept(ASMVisitor it) {
