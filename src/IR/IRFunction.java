@@ -2,6 +2,7 @@ package IR;
 
 import IR.IRType.IRType;
 import IR.IRValue.IRRegister;
+import IR.Instruction.IRAllocaInstruction;
 
 import java.util.ArrayList;
 
@@ -12,6 +13,7 @@ public class IRFunction {
     public ArrayList<IRType> parameterTypes;
     public ArrayList<String> parameterNames;
     public ArrayList<IRBlock> blocks;
+    public ArrayList<IRAllocaInstruction> allocaInstructions;
     public IRBlock entryBlock;
     public IRBlock returnBlock;
     public IRRegister thisReg;
@@ -24,6 +26,7 @@ public class IRFunction {
         this.parameterTypes = new ArrayList<>();
         this.parameterNames = new ArrayList<>();
         this.blocks = new ArrayList<>();
+        this.allocaInstructions = new ArrayList<>();
         this.entryBlock = new IRBlock(this, "entry");
         this.returnBlock = new IRBlock(this, "return");
         this.thisReg = null;

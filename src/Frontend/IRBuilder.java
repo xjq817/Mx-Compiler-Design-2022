@@ -352,7 +352,8 @@ public class IRBuilder implements ASTVisitor {
             boolean isOr = Objects.equals(it.op, "||");
             //phi is used to store the path of logic value
             IRRegister phi = new IRRegister(new IRPointType(IRGlobalBlock.boolType), "phi");
-            curBlock.instructions.add(new IRAllocaInstruction(phi, IRGlobalBlock.boolType, curBlock));
+//            curBlock.instructions.add(new IRAllocaInstruction(phi, IRGlobalBlock.boolType, curBlock));
+            curFunction.allocaInstructions.add(new IRAllocaInstruction(phi, IRGlobalBlock.boolType, curFunction.entryBlock));
             //add a ifBlock
             it.lhs.accept(this);
             int id = labelCnt++;
@@ -726,7 +727,8 @@ public class IRBuilder implements ASTVisitor {
         if (pos == layerReg.size() - 1) return arrPtr;
         //use forBlock to complete new arr
         IRRegister iterPtr = new IRRegister(new IRPointType(new IRPointType(newType)), "iter_ptr");
-        curBlock.instructions.add(new IRAllocaInstruction(iterPtr, new IRPointType(newType), curBlock));
+//        curBlock.instructions.add(new IRAllocaInstruction(iterPtr, new IRPointType(newType), curBlock));
+        curFunction.allocaInstructions.add(new IRAllocaInstruction(iterPtr, new IRPointType(newType), curFunction.entryBlock));
         curBlock.instructions.add(new IRStoreInstruction(new IRPointType(newType), iterPtr, arrPtr, curBlock));
         IRRegister endPtr = new IRRegister(new IRPointType(newType), "end_ptr");
         IRGetelementptrInstruction getPtrIns2 = new IRGetelementptrInstruction(endPtr, newType, arrPtr, curBlock);
@@ -820,7 +822,8 @@ public class IRBuilder implements ASTVisitor {
         VarEntity entity = curScope.getVarEntity(curFunction.parameterNames.get(0));
         entity.ptr = thisPtr;
         curFunction.thisReg = curFunction.parameterRegs.get(0);
-        curBlock.instructions.add(new IRAllocaInstruction(thisPtr, type, curBlock));
+//        curBlock.instructions.add(new IRAllocaInstruction(thisPtr, type, curBlock));
+        curFunction.allocaInstructions.add(new IRAllocaInstruction(thisPtr, type, curFunction.entryBlock));
         curBlock.instructions.add(new IRStoreInstruction(type, thisPtr, curFunction.parameterRegs.get(0), curBlock));
         it.stmts.forEach(cur -> cur.accept(this));
 
@@ -876,7 +879,8 @@ public class IRBuilder implements ASTVisitor {
             if (varIRType.isClassPtrType()) {
                 if (it.expr != null) {
                     varPtr = new IRRegister(new IRPointType(varIRType), "alloca_" + it.name.name);
-                    curBlock.instructions.add(new IRAllocaInstruction(varPtr, varIRType, curBlock));
+//                    curBlock.instructions.add(new IRAllocaInstruction(varPtr, varIRType, curBlock));
+                    curFunction.allocaInstructions.add(new IRAllocaInstruction(varPtr, varIRType, curFunction.entryBlock));
                     it.expr.accept(this);
                     IRValue val = it.expr.register;
                     curBlock.instructions.add(new IRStoreInstruction(varIRType, varPtr, val, curBlock));
@@ -891,12 +895,14 @@ public class IRBuilder implements ASTVisitor {
                     curBlock.instructions.add(new IRBitcastInstruction(classPtr, mallocPtr, varIRType, curBlock));
 
                     varPtr = new IRRegister(new IRPointType(varIRType), "alloca_" + it.name.name);
-                    curBlock.instructions.add(new IRAllocaInstruction(varPtr, varIRType, curBlock));
+//                    curBlock.instructions.add(new IRAllocaInstruction(varPtr, varIRType, curBlock));
+                    curFunction.allocaInstructions.add(new IRAllocaInstruction(varPtr, varIRType, curFunction.entryBlock));
                     curBlock.instructions.add(new IRStoreInstruction(varIRType, varPtr, classPtr, curBlock));
                 }
             } else {
                 varPtr = new IRRegister(new IRPointType(varIRType), "alloca_" + it.name.name);
-                curBlock.instructions.add(new IRAllocaInstruction(varPtr, varIRType, curBlock));
+//                curBlock.instructions.add(new IRAllocaInstruction(varPtr, varIRType, curBlock));
+                curFunction.allocaInstructions.add(new IRAllocaInstruction(varPtr, varIRType, curFunction.entryBlock));
                 IRValue value;
                 if (it.expr != null) {
                     it.expr.accept(this);
@@ -925,7 +931,8 @@ public class IRBuilder implements ASTVisitor {
             IRRegister parameterPtr = new IRRegister(new IRPointType(parameterType), "parameter_ptr");
             VarEntity varEntity = curScope.getVarEntity(curFunction.parameterNames.get(i));
             varEntity.ptr = parameterPtr;
-            curBlock.instructions.add(new IRAllocaInstruction(parameterPtr, parameterType, curBlock));
+//            curBlock.instructions.add(new IRAllocaInstruction(parameterPtr, parameterType, curBlock));
+            curFunction.allocaInstructions.add(new IRAllocaInstruction(parameterPtr, parameterType, curFunction.entryBlock));
             if (classScope != null && i == 0)
                 ((FuncScope) curScope).thisPtr = parameterPtr;
         }
@@ -945,7 +952,8 @@ public class IRBuilder implements ASTVisitor {
             curFunction.returnBlock.exitInstruction = new IRRetInstruction(IRGlobalBlock.voidType, null, curFunction.returnBlock);
         } else {
             IRRegister returnPtr = new IRRegister(new IRPointType(returnType), "return_ptr");
-            curBlock.instructions.add(new IRAllocaInstruction(returnPtr, returnType, curBlock));
+//            curBlock.instructions.add(new IRAllocaInstruction(returnPtr, returnType, curBlock));
+            curFunction.allocaInstructions.add(new IRAllocaInstruction(returnPtr, returnType, curFunction.entryBlock));
             ((FuncScope) curScope).returnPtr = returnPtr;
             if (Objects.equals(funcName, "main"))
                 curBlock.instructions.add(new IRStoreInstruction(returnType, returnPtr, new IRConstInt(0), curBlock));
@@ -961,6 +969,9 @@ public class IRBuilder implements ASTVisitor {
         curBlock = curFunction.returnBlock;
         completeBlock(null);
         curScope = curScope.parentScope;
+        ArrayList<IRInstruction> newInst = new ArrayList<>(curFunction.allocaInstructions);
+        newInst.addAll(curFunction.entryBlock.instructions);
+        curFunction.entryBlock.instructions=newInst;
         curFunction = null;
         curBlock = null;
     }

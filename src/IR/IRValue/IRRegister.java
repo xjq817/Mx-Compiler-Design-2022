@@ -18,6 +18,7 @@ public class IRRegister extends IRValue {
     @Override
     public String toString() {
         if (isGlobal) return "@" + name;
-        return "%" + name + "_" + id;
+//        return "%" + name + "_" + id;
+        return "%" + id;
     }
 }
