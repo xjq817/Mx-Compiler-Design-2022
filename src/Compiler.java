@@ -46,6 +46,8 @@ public class Compiler {
             stringCollector.visit(ASTRoot);
             IRBuilder irBuilder = new IRBuilder(globalScope, irGlobalBlock);
             irBuilder.visit(ASTRoot);
+            mem2reg mem2reg = new mem2reg();
+            mem2reg.visit(irGlobalBlock);
             //IRPrinter irPrinter = new IRPrinter(iroutput);
             //irPrinter.visit(irGlobalBlock);
             ASMBuilder asmBuilder = new ASMBuilder(asmGlobalBlock);

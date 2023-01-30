@@ -135,7 +135,9 @@ public class ASMBuilder implements IRVisitor {
         ASMVirtualRegister rs1, rs2;
         rs1 = transVReg(it.storeVal);
         rs2 = transVReg(it.storeAddr);
-        curBlock.instructions.add(new ASMStoreInstruction(4, rs1, rs2, new ASMImm(0), curBlock));
+        if (it.storeAddr instanceof IRRegister && ((IRRegister) it.storeAddr).isTmp)
+            curBlock.instructions.add(new ASMMvInstruction(rs2, rs1, curBlock));
+        else curBlock.instructions.add(new ASMStoreInstruction(4, rs1, rs2, new ASMImm(0), curBlock));
     }
 
     @Override

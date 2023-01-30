@@ -834,6 +834,9 @@ public class IRBuilder implements ASTVisitor {
         curBlock = curFunction.returnBlock;
         completeBlock(null);
         curScope = curScope.parentScope;
+        ArrayList<IRInstruction> newInst = new ArrayList<>(curFunction.allocaInstructions);
+        newInst.addAll(curFunction.entryBlock.instructions);
+        curFunction.entryBlock.instructions = newInst;
         curFunction = null;
         curBlock = null;
     }
@@ -850,6 +853,7 @@ public class IRBuilder implements ASTVisitor {
         if (curScope instanceof GlobalScope) {
             IRRegister varPtr = new IRRegister(new IRPointType(varIRType), it.name.name);
             varPtr.isGlobal = true;
+            varPtr.id = -1;
             gScope.varEntities.get(it.name.name).ptr = varPtr;
             if (it.expr != null) {
                 IRFunction initFunction = gBlock.newSingleInitFunction();
@@ -971,7 +975,7 @@ public class IRBuilder implements ASTVisitor {
         curScope = curScope.parentScope;
         ArrayList<IRInstruction> newInst = new ArrayList<>(curFunction.allocaInstructions);
         newInst.addAll(curFunction.entryBlock.instructions);
-        curFunction.entryBlock.instructions=newInst;
+        curFunction.entryBlock.instructions = newInst;
         curFunction = null;
         curBlock = null;
     }
