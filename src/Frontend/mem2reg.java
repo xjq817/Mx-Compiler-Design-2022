@@ -13,6 +13,7 @@ import IR.Instruction.*;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 public class mem2reg implements IRVisitor {
     public IRFunction curFunction;

@@ -24,6 +24,6 @@ public class IRStoreInstruction extends IRInstruction {
 
     @Override
     public String toString() {
-        return "store " + storeType + " " + storeVal + ", " + storeType + "* " + storeAddr + ", align " + storeType.sizeof();
+        return "store " + storeVal.type + " " + storeVal + ", " + storeAddr.type + " " + storeAddr + ", align " + storeType.sizeof();
     }
 }
