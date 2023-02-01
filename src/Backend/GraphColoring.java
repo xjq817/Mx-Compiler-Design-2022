@@ -375,9 +375,9 @@ public class GraphColoring {
         while (!selectStack.isEmpty()) {
             ASMRegister n = selectStack.pop();
             ArrayList<Integer> okColors = new ArrayList<>(gBlock.okColor);
+            HashSet<ASMRegister> colored = new HashSet<>(coloredNodes);
+            colored.addAll(precolored);
             adjList.get(n).forEach(w -> {
-                HashSet<ASMRegister> colored = new HashSet<>(coloredNodes);
-                colored.addAll(precolored);
                 if (colored.contains(GetAlias(w)))
                     okColors.remove(color.get(GetAlias(w)));
             });
@@ -389,6 +389,11 @@ public class GraphColoring {
 
             }
         }
+
+//        if (Objects.equals(curFunction.name, "main")){
+//            System.out.println("fuck");
+//        }
+
         coalescedNodes.forEach(n -> {
             color.replace(n, color.get(GetAlias(n)));
             //System.out.println(n.toString()+" "+GetAlias(n).toString()+" "+color.get(GetAlias(n)));
@@ -518,9 +523,14 @@ public class GraphColoring {
                 else break;
             }
 
+//            if (Objects.equals(it.name, "main")){
+//                System.out.println("fuck");
+//            }
+
             AssignColors();
 
-            if (!spilledNodes.isEmpty()) RewriteProgram();
+            if (!spilledNodes.isEmpty())
+                RewriteProgram();
             else break;
         }
     }

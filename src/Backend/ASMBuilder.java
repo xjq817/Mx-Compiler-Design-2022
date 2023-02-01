@@ -314,7 +314,7 @@ public class ASMBuilder implements IRVisitor {
                 });
             }
         });
-    */
+*/
         //s0 offset need to be allocSize
         it.functions.forEach((name, func) -> {
             if (!func.declare) {
