@@ -313,7 +313,7 @@ public class GraphColoring {
             coalescedMoves.add(m);
             AddWorkList(u);
         } else if (precolored.contains(v) || adjSet.contains(new Pair<>(u, v))) {
-            coalescedMoves.add(m);
+            constrainedMoves.add(m);
             AddWorkList(u);
             AddWorkList(v);
         } else {
