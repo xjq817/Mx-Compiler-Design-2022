@@ -164,8 +164,52 @@ public class GraphColoring {
     }
 
     void Build() {
+        while (true) {
+            init();
+            curFunction.blocks.forEach(block -> {
+                curBlock = block;
+                block.pred = new HashSet<>();
+                block.succ = new HashSet<>();
+                blocks.put(block.name, block);
+                block.instructions.forEach(inst -> {
+                    initial.addAll(inst.def);
+                    initial.addAll(inst.use);
+                });
+            });
+            initial.removeAll(precolored);
+            initial.forEach(n -> {
+                color.put(n, null);
+                degree.put(n, 0);
+                alias.put(n, n);
+                adjList.put(n, new HashSet<>());
+                moveList.put(n, new HashSet<>());
+            });
+            LivenessAnalysis();
+
+            AtomicBoolean flag = new AtomicBoolean(true);
+            //*
+            curFunction.blocks.forEach(block -> {
+                curBlock = block;
+                HashSet<ASMRegister> live = new HashSet<>(blockOut.get(block));
+                ArrayList<ASMInstruction> newInst = new ArrayList<>();
+                for (int i = block.instructions.size() - 1; i >= 0; i--) {
+                    ASMInstruction inst = block.instructions.get(i);
+                    if (inst.isRemain || inst.rd == null || live.contains(inst.rd)) {
+                        live.removeAll(inst.def);
+                        live.addAll(inst.use);
+                        newInst.add(inst);
+                    }
+                }
+                flag.set(flag.get() & (newInst.size() == block.instructions.size()));
+                block.instructions.clear();
+                for (int i = newInst.size() - 1; i >= 0; i--)
+                    block.instructions.add(newInst.get(i));
+            });
+            //*/
+            if (flag.get()) break;
+        }
         curFunction.blocks.forEach(block -> {
-            HashSet<ASMRegister> live = blockOut.get(block);
+            HashSet<ASMRegister> live = new HashSet<>(blockOut.get(block));
             for (int i = block.instructions.size() - 1; i >= 0; i--) {
                 ASMInstruction inst = block.instructions.get(i);
                 if (inst instanceof ASMMvInstruction) {
@@ -479,26 +523,7 @@ public class GraphColoring {
     void visit(ASMFunction it) {
         curFunction = it;
         while (true) {
-            init();
-            it.blocks.forEach(block -> {
-                curBlock = block;
-                block.pred = new HashSet<>();
-                block.succ = new HashSet<>();
-                blocks.put(block.name, block);
-                block.instructions.forEach(inst -> {
-                    initial.addAll(inst.def);
-                    initial.addAll(inst.use);
-                });
-            });
-            initial.removeAll(precolored);
-            initial.forEach(n -> {
-                color.put(n, null);
-                degree.put(n, 0);
-                alias.put(n, n);
-                adjList.put(n, new HashSet<>());
-                moveList.put(n, new HashSet<>());
-            });
-            LivenessAnalysis();
+
             Build();
             MakeWorklist();
             while (true) {

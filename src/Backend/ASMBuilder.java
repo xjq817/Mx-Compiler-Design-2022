@@ -112,17 +112,18 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRCallInstruction it) {
+        ASMCallInstruction inst = new ASMCallInstruction(it.function.name);
+        inst.def.addAll(gBlock.caller);
         for (int i = 0; i < it.argumentValues.size(); i++) {
             ASMRegister virtualReg = transVReg(it.argumentValues.get(i));
-            if (i < parameterSize)
+            if (i < parameterSize) {
                 curBlock.instructions.add(new ASMMvInstruction(gBlock.physicalRegs.get(10 + i), virtualReg));
-            else
+                inst.use.add(gBlock.physicalRegs.get(10 + i));
+            } else
                 curBlock.instructions.add(new ASMStoreInstruction(4, virtualReg, s0, new ASMImm(-4 * (i + 1 - parameterSize))));
         }
         if ((it.argumentValues.size() - parameterSize) * 4 > curFunction.parameterSize)
             curFunction.parameterSize = (it.argumentValues.size() - parameterSize) * 4;
-        ASMCallInstruction inst = new ASMCallInstruction(it.function.name);
-        inst.def.addAll(gBlock.caller);
         curBlock.instructions.add(inst);
         if (!(it.type instanceof IRVoidType))
             curBlock.instructions.add(new ASMMvInstruction(transVReg(it.register), a0));
@@ -138,11 +139,16 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRRetInstruction it) {
-        for (int i = 0; i < gBlock.callee.size(); i++)
-            curBlock.instructions.add(new ASMMvInstruction(gBlock.callee.get(i), calleeList.get(i)));
+        for (int i = 0; i < gBlock.callee.size(); i++) {
+            ASMMvInstruction inst = new ASMMvInstruction(gBlock.callee.get(i), calleeList.get(i));
+            inst.isRemain = true;
+            curBlock.instructions.add(inst);
+        }
         if (!(it.retType instanceof IRVoidType)) {
             ASMRegister rs1 = transVReg(it.retValue);
-            curBlock.instructions.add(new ASMMvInstruction(a0, rs1));
+            ASMMvInstruction inst = new ASMMvInstruction(a0, rs1);
+            inst.isRemain = true;
+            curBlock.instructions.add(inst);
         }
     }
 
@@ -287,6 +293,9 @@ public class ASMBuilder implements IRVisitor {
             }
         });
         //vReg->pReg
+
+        //new ASMPrinter(System.out).visit(gBlock);
+
         new GraphColoring().visit(gBlock);
 /*
         it.functions.forEach((name, func) -> {
@@ -320,11 +329,24 @@ public class ASMBuilder implements IRVisitor {
             if (!func.declare) {
                 curFunction = gBlock.functions.get(name);
                 int size = curFunction.allocSize + curFunction.parameterSize;
+
                 curBlock = curFunction.entryBlock;
-                curBlock.instructions.get(0).imm.imm = -size;
-                curBlock.instructions.get(3).imm.imm = size;
+                newInst = new ArrayList<>();
+                newInst.add(new ASMBinaryInstruction("addi", new ASMImm(-size), sp, sp, null));
+                newInst.add(new ASMStoreInstruction(4, ra, sp, new ASMImm(4)));
+                newInst.add(new ASMStoreInstruction(4, s0, sp, new ASMImm(0)));
+                newInst.add(new ASMBinaryInstruction("addi", new ASMImm(size), s0, sp, null));
+                newInst.addAll(curBlock.instructions);
+                curBlock.instructions = newInst;
+//                curBlock.instructions.get(0).imm.imm = -size;
+//                curBlock.instructions.get(3).imm.imm = size;
+
                 curBlock = curFunction.returnBlock;
-                curBlock.instructions.get(curBlock.instructions.size() - 2).imm.imm = size;
+                curBlock.instructions.add(new ASMLoadInstruction(4, ra, sp, new ASMImm(4)));
+                curBlock.instructions.add(new ASMLoadInstruction(4, s0, sp, new ASMImm(0)));
+                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(size), sp, sp, null));
+                curBlock.instructions.add(new ASMRetInstruction());
+//                curBlock.instructions.get(curBlock.instructions.size() - 2).imm.imm = size;
                 curFunction.blocks.forEach(cur -> {
                     curBlock = cur;
                     newInst = new ArrayList<>();
@@ -355,16 +377,18 @@ public class ASMBuilder implements IRVisitor {
             curFunction.blocks.add(curBlock);
             if (Objects.equals(cur.label, it.name + ".entry")) {
                 curFunction.entryBlock = curBlock;
-                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), sp, sp, null));
-                curBlock.instructions.add(new ASMStoreInstruction(4, ra, sp, new ASMImm(4)));
-                curBlock.instructions.add(new ASMStoreInstruction(4, s0, sp, new ASMImm(0)));
-                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), s0, sp, null));
+//                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), sp, sp, null));
+//                curBlock.instructions.add(new ASMStoreInstruction(4, ra, sp, new ASMImm(4)));
+//                curBlock.instructions.add(new ASMStoreInstruction(4, s0, sp, new ASMImm(0)));
+//                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), s0, sp, null));
                 //parameter
                 calleeList = new ArrayList<>();
                 gBlock.callee.forEach(n -> {
                     ASMVirtualRegister reg = new ASMVirtualRegister("callee");
                     calleeList.add(reg);
-                    curBlock.instructions.add(new ASMMvInstruction(reg, n));
+                    ASMMvInstruction inst = new ASMMvInstruction(reg, n);
+                    inst.isRemain = true;
+                    curBlock.instructions.add(inst);
                 });
                 ASMVirtualRegister virS0 = new ASMVirtualRegister("vir_s0");
                 for (int i = 0; i < it.parameterRegs.size(); i++) {
@@ -381,10 +405,10 @@ public class ASMBuilder implements IRVisitor {
             cur.accept(this);
             if (Objects.equals(cur.label, it.name + ".return")) {
                 curFunction.returnBlock = curBlock;
-                curBlock.instructions.add(new ASMLoadInstruction(4, ra, sp, new ASMImm(4)));
-                curBlock.instructions.add(new ASMLoadInstruction(4, s0, sp, new ASMImm(0)));
-                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), sp, sp, null));
-                curBlock.instructions.add(new ASMRetInstruction());
+//                curBlock.instructions.add(new ASMLoadInstruction(4, ra, sp, new ASMImm(4)));
+//                curBlock.instructions.add(new ASMLoadInstruction(4, s0, sp, new ASMImm(0)));
+//                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), sp, sp, null));
+//                curBlock.instructions.add(new ASMRetInstruction());
             }
         });
     }
