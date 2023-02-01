@@ -25,7 +25,7 @@ public class ASMBuilder implements IRVisitor {
     public ASMFunction curFunction;
     public ArrayList<ASMVirtualRegister> calleeList;
 
-    int parameterSize = 3;
+    int parameterSize = 8;
 
     ASMPhysicalRegister sp;
     ASMPhysicalRegister s0;
@@ -65,7 +65,7 @@ public class ASMBuilder implements IRVisitor {
         return op;
     }
 
-    ASMVirtualRegister transVReg(IRValue value) {
+    ASMRegister transVReg(IRValue value) {
         if (value instanceof IRRegister) {
             IRRegister reg = (IRRegister) value;
             if (reg.isGlobal) {
@@ -90,13 +90,14 @@ public class ASMBuilder implements IRVisitor {
         else if (value instanceof IRConstBool) imm = ((IRConstBool) value).value ? 1 : 0;
         else if (value instanceof IRConstNull) imm = 0;
         else throw new ASMError("trans virtual register error.");
+        if (imm == 0) return gBlock.physicalRegs.get(0);
         curBlock.instructions.add(new ASMLiInstruction(virtualReg, new ASMImm(imm)));
         return virtualReg;
     }
 
     @Override
     public void visit(IRAllocaInstruction it) {
-        ASMVirtualRegister rd = transVReg(it.allocaRegister);
+        ASMRegister rd = transVReg(it.allocaRegister);
         ASMVirtualRegister newReg = new ASMVirtualRegister("new_vir_reg");
         funcAlloc(newReg);
         curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(newReg.offset), rd, sp, null));
@@ -104,7 +105,7 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRBrInstruction it) {
-        ASMVirtualRegister rs1 = transVReg(it.condition);
+        ASMRegister rs1 = transVReg(it.condition);
         curBlock.instructions.add(new ASMBranchInstruction("beqz", it.elseBlock.label, rs1));
         curBlock.instructions.add(new ASMBranchInstruction("j", it.thenBlock.label, null));
     }
@@ -112,7 +113,7 @@ public class ASMBuilder implements IRVisitor {
     @Override
     public void visit(IRCallInstruction it) {
         for (int i = 0; i < it.argumentValues.size(); i++) {
-            ASMVirtualRegister virtualReg = transVReg(it.argumentValues.get(i));
+            ASMRegister virtualReg = transVReg(it.argumentValues.get(i));
             if (i < parameterSize)
                 curBlock.instructions.add(new ASMMvInstruction(gBlock.physicalRegs.get(10 + i), virtualReg));
             else
@@ -129,7 +130,7 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRLoadInstruction it) {
-        ASMVirtualRegister rd, rs1;
+        ASMRegister rd, rs1;
         rd = transVReg(it.register);
         rs1 = transVReg(it.loadFrom);
         curBlock.instructions.add(new ASMLoadInstruction(4, rd, rs1, new ASMImm(0)));
@@ -140,14 +141,14 @@ public class ASMBuilder implements IRVisitor {
         for (int i = 0; i < gBlock.callee.size(); i++)
             curBlock.instructions.add(new ASMMvInstruction(gBlock.callee.get(i), calleeList.get(i)));
         if (!(it.retType instanceof IRVoidType)) {
-            ASMVirtualRegister rs1 = transVReg(it.retValue);
+            ASMRegister rs1 = transVReg(it.retValue);
             curBlock.instructions.add(new ASMMvInstruction(a0, rs1));
         }
     }
 
     @Override
     public void visit(IRStoreInstruction it) {
-        ASMVirtualRegister rs1, rs2;
+        ASMRegister rs1, rs2;
         rs1 = transVReg(it.storeVal);
         rs2 = transVReg(it.storeAddr);
         if (it.storeAddr.type.toString().equals(it.storeVal.type.toString()) || it.storeVal.toString().equals("null"))
@@ -157,7 +158,7 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRBinaryInstruction it) {
-        ASMVirtualRegister rd, rs1, rs2;
+        ASMRegister rd, rs1, rs2;
         rd = transVReg(it.register);
         rs1 = transVReg(it.lhs);
         rs2 = transVReg(it.rhs);
@@ -166,7 +167,7 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRIcmpInstruction it) {
-        ASMVirtualRegister rd, rs1, rs2;
+        ASMRegister rd, rs1, rs2;
         rd = transVReg(it.register);
         rs1 = transVReg(it.lhs);
         rs2 = transVReg(it.rhs);
@@ -191,7 +192,7 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRTruncInstruction it) {
-        ASMVirtualRegister rd, rs1;
+        ASMRegister rd, rs1;
         rd = transVReg(it.register);
         rs1 = transVReg(it.value);
         curBlock.instructions.add(new ASMMvInstruction(rd, rs1));
@@ -199,7 +200,7 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRZextInstruction it) {
-        ASMVirtualRegister rd, rs1;
+        ASMRegister rd, rs1;
         rd = transVReg(it.register);
         rs1 = transVReg(it.value);
         curBlock.instructions.add(new ASMMvInstruction(rd, rs1));
@@ -207,7 +208,7 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRGetelementptrInstruction it) {
-        ASMVirtualRegister rd, rs1, rs2, tmp;
+        ASMRegister rd, rs1, rs2, tmp;
         rd = transVReg(it.register);
         rs1 = transVReg(it.ptrValue);
         if (it.values.size() == 1) {
@@ -233,7 +234,7 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRBitcastInstruction it) {
-        ASMVirtualRegister rd, rs1;
+        ASMRegister rd, rs1;
         rd = transVReg(it.register);
         rs1 = transVReg(it.value);
         curBlock.instructions.add(new ASMMvInstruction(rd, rs1));
@@ -286,7 +287,6 @@ public class ASMBuilder implements IRVisitor {
             }
         });
         //vReg->pReg
-        //new ASMPrinter(System.out).visit(gBlock);
         new GraphColoring().visit(gBlock);
 /*
         it.functions.forEach((name, func) -> {
@@ -368,7 +368,7 @@ public class ASMBuilder implements IRVisitor {
                 });
                 ASMVirtualRegister virS0 = new ASMVirtualRegister("vir_s0");
                 for (int i = 0; i < it.parameterRegs.size(); i++) {
-                    ASMVirtualRegister rd = transVReg(it.parameterRegs.get(i));
+                    ASMRegister rd = transVReg(it.parameterRegs.get(i));
                     if (i < parameterSize)
                         curBlock.instructions.add(new ASMMvInstruction(rd, gBlock.physicalRegs.get(10 + i)));
                     else {

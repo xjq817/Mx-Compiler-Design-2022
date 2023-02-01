@@ -150,7 +150,6 @@ public class GraphColoring {
 
     void AddEdge(ASMRegister u, ASMRegister v) {
         if (u != v && !adjSet.contains(new Pair<>(u, v))) {
-            //System.out.println(u.toString() + " " + v.toString());
             adjSet.add(new Pair<>(u, v));
             adjSet.add(new Pair<>(v, u));
             if (!precolored.contains(u)) {
@@ -233,7 +232,7 @@ public class GraphColoring {
             HashSet<ASMRegister> nodes = new HashSet<>(Adjacent(m));
             nodes.add(m);
             EnableMoves(nodes);
-            spillWorklist.remove(m);//??
+            spillWorklist.remove(m);
             if (MoveRelated(m)) freezeWorklist.add(m);
             else simplifyWorklist.add(m);
         }
@@ -313,7 +312,7 @@ public class GraphColoring {
         if (u == v) {
             coalescedMoves.add(m);
             AddWorkList(u);
-        } else if (precolored.contains(v) || adjSet.contains(new Pair<>(u, v))) {//zero?
+        } else if (precolored.contains(v) || adjSet.contains(new Pair<>(u, v))) {
             coalescedMoves.add(m);
             AddWorkList(u);
             AddWorkList(v);
@@ -385,19 +384,10 @@ public class GraphColoring {
             else {
                 coloredNodes.add(n);
                 color.replace(n, okColors.get(0));
-                //System.out.println(n.toString()+" "+color.get(n));
-
             }
         }
 
-//        if (Objects.equals(curFunction.name, "main")){
-//            System.out.println("fuck");
-//        }
-
-        coalescedNodes.forEach(n -> {
-            color.replace(n, color.get(GetAlias(n)));
-            //System.out.println(n.toString()+" "+GetAlias(n).toString()+" "+color.get(GetAlias(n)));
-        });
+        coalescedNodes.forEach(n -> color.replace(n, color.get(GetAlias(n))));
     }
 
     void funcAlloc(ASMVirtualRegister reg) {
@@ -488,10 +478,8 @@ public class GraphColoring {
 
     void visit(ASMFunction it) {
         curFunction = it;
-
         while (true) {
             init();
-
             it.blocks.forEach(block -> {
                 curBlock = block;
                 block.pred = new HashSet<>();
@@ -510,11 +498,9 @@ public class GraphColoring {
                 adjList.put(n, new HashSet<>());
                 moveList.put(n, new HashSet<>());
             });
-
             LivenessAnalysis();
             Build();
             MakeWorklist();
-
             while (true) {
                 if (!simplifyWorklist.isEmpty()) Simplify();
                 else if (!worklistMoves.isEmpty()) Coalesce();
@@ -522,13 +508,7 @@ public class GraphColoring {
                 else if (!spillWorklist.isEmpty()) SelectSpill();
                 else break;
             }
-
-//            if (Objects.equals(it.name, "main")){
-//                System.out.println("fuck");
-//            }
-
             AssignColors();
-
             if (!spilledNodes.isEmpty())
                 RewriteProgram();
             else break;
