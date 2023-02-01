@@ -1,19 +1,14 @@
 package ASM.Instruction;
 
-import ASM.ASMBlock;
 import ASM.Operand.ASMImm;
 import ASM.Operand.ASMRegister;
 
 public class ASMStoreInstruction extends ASMInstruction {
     int bit;
 
-    public ASMStoreInstruction(int bit, ASMRegister rs1, ASMRegister rs2, ASMImm imm, ASMBlock parentBlock) {
-        super(parentBlock);
+    public ASMStoreInstruction(int bit, ASMRegister rs1, ASMRegister rs2, ASMImm imm) {
+        super(null, rs1, rs2, imm);
         this.bit = bit;
-        this.rd = null;
-        this.rs1 = rs1;
-        this.rs2 = rs2;
-        this.imm = imm;
     }
 
     @Override

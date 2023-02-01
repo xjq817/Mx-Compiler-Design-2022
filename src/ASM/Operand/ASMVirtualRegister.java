@@ -11,8 +11,4 @@ public class ASMVirtualRegister extends ASMRegister {
         this.isAlloc = false;
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
 }

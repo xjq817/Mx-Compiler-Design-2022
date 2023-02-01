@@ -5,178 +5,95 @@
 
 main:
 .main.entry:
-	addi	sp,	sp,	-164
+	addi	sp,	sp,	0
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
-	addi	s0,	sp,	164
-	addi	t0,	sp,	8
-	sw		t0,	16(sp)
-	addi	t0,	sp,	12
-	sw		t0,	20(sp)
-	li		t0,	0
-	sw		t0,	24(sp)
-	lw		t1,	24(sp)
-	lw		t2,	16(sp)
-	sw		t1,	0(t2)
-	la		t0,	n
-	sw		t0,	28(sp)
-	lw		t1,	28(sp)
-	lw		t0,	0(t1)
-	sw		t0,	32(sp)
-	call	getInt
-	mv		t0,	a0
-	sw		t0,	36(sp)
-	la		t0,	n
-	sw		t0,	40(sp)
-	lw		t1,	36(sp)
-	lw		t2,	40(sp)
-	sw		t1,	0(t2)
-	la		t0,	a
-	sw		t0,	44(sp)
-	lw		t1,	44(sp)
-	lw		t0,	0(t1)
-	sw		t0,	48(sp)
-	la		t0,	n
-	sw		t0,	52(sp)
-	lw		t1,	52(sp)
-	lw		t0,	0(t1)
-	sw		t0,	56(sp)
-	la		t0,	n
-	sw		t0,	60(sp)
-	lw		t1,	60(sp)
-	lw		t0,	0(t1)
-	sw		t0,	64(sp)
-	li		t0,	4
-	sw		t0,	68(sp)
-	lw		t1,	56(sp)
-	lw		t2,	68(sp)
-	mul		t0,	t1,	t2
-	sw		t0,	72(sp)
-	li		t0,	4
-	sw		t0,	76(sp)
-	lw		t1,	72(sp)
-	lw		t2,	76(sp)
-	add		t0,	t1,	t2
-	sw		t0,	80(sp)
-	lw		t1,	80(sp)
-	mv		a0,	t1
-	call	__malloc
-	mv		t0,	a0
-	sw		t0,	84(sp)
-	lw		t1,	84(sp)
-	mv		t0,	t1
-	sw		t0,	88(sp)
-	lw		t1,	56(sp)
-	lw		t2,	88(sp)
-	sw		t1,	0(t2)
-	lw		t1,	84(sp)
-	addi	t0,	t1,	4
-	sw		t0,	92(sp)
-	lw		t1,	92(sp)
-	mv		t0,	t1
-	sw		t0,	96(sp)
-	lw		t1,	96(sp)
-	lw		t2,	20(sp)
-	sw		t1,	0(t2)
-	li		t0,	4
-	sw		t0,	100(sp)
-	lw		t1,	100(sp)
-	lw		t2,	56(sp)
-	mul		t0,	t1,	t2
-	sw		t0,	100(sp)
-	lw		t1,	96(sp)
-	lw		t2,	100(sp)
-	add		t0,	t1,	t2
-	sw		t0,	104(sp)
-	j		.main.0_get_new_array_condition
-.main.0_get_new_array_condition:
-	lw		t1,	20(sp)
-	lw		t0,	0(t1)
-	sw		t0,	108(sp)
-	lw		t1,	108(sp)
-	lw		t2,	104(sp)
-	xor		t0,	t1,	t2
-	sw		t0,	112(sp)
-	lw		t1,	112(sp)
-	snez	t0,	t1
-	sw		t0,	112(sp)
-	lw		t1,	112(sp)
-	beqz	t1,	.main.0_get_new_array_terminate
-.main.0_get_new_array_loop:
-	li		t0,	4
-	sw		t0,	116(sp)
-	lw		t1,	64(sp)
-	lw		t2,	116(sp)
-	mul		t0,	t1,	t2
-	sw		t0,	120(sp)
-	li		t0,	4
-	sw		t0,	124(sp)
-	lw		t1,	120(sp)
-	lw		t2,	124(sp)
-	add		t0,	t1,	t2
-	sw		t0,	128(sp)
-	lw		t1,	128(sp)
-	mv		a0,	t1
-	call	__malloc
-	mv		t0,	a0
-	sw		t0,	132(sp)
-	lw		t1,	132(sp)
-	mv		t0,	t1
-	sw		t0,	136(sp)
-	lw		t1,	64(sp)
-	lw		t2,	136(sp)
-	sw		t1,	0(t2)
-	lw		t1,	132(sp)
-	addi	t0,	t1,	4
-	sw		t0,	140(sp)
-	lw		t1,	140(sp)
-	mv		t0,	t1
-	sw		t0,	144(sp)
-	lw		t1,	144(sp)
-	lw		t2,	108(sp)
-	sw		t1,	0(t2)
-	lw		t1,	108(sp)
-	addi	t0,	t1,	4
-	sw		t0,	148(sp)
-	lw		t1,	148(sp)
-	lw		t2,	20(sp)
-	sw		t1,	0(t2)
-	j		.main.0_get_new_array_condition
-.main.0_get_new_array_terminate:
-	la		t0,	a
-	sw		t0,	152(sp)
-	lw		t1,	96(sp)
-	lw		t2,	152(sp)
-	sw		t1,	0(t2)
-	li		t0,	0
-	sw		t0,	156(sp)
-	lw		t1,	156(sp)
-	lw		t2,	16(sp)
-	sw		t1,	0(t2)
+	addi	s0,	sp,	0
+	mv		ASM.Operand.ASMVirtualRegister@617c74e5,	s0
+	mv		ASM.Operand.ASMVirtualRegister@6537cf78,	s1
+	mv		ASM.Operand.ASMVirtualRegister@67b6d4ae,	s2
+	mv		ASM.Operand.ASMVirtualRegister@34b7bfc0,	s3
+	mv		ASM.Operand.ASMVirtualRegister@366e2eef,	s4
+	mv		ASM.Operand.ASMVirtualRegister@6df97b55,	s5
+	mv		ASM.Operand.ASMVirtualRegister@3cbbc1e0,	s6
+	mv		ASM.Operand.ASMVirtualRegister@35fb3008,	s7
+	mv		ASM.Operand.ASMVirtualRegister@7225790e,	s8
+	mv		ASM.Operand.ASMVirtualRegister@54a097cc,	s9
+	mv		ASM.Operand.ASMVirtualRegister@36f6e879,	s10
+	mv		ASM.Operand.ASMVirtualRegister@5a61f5df,	s11
+	li		ASM.Operand.ASMVirtualRegister@52af6cff,	0
+	mv		ASM.Operand.ASMVirtualRegister@735b478,	ASM.Operand.ASMVirtualRegister@52af6cff
+	li		ASM.Operand.ASMVirtualRegister@2c9f9fb0,	0
+	mv		ASM.Operand.ASMVirtualRegister@2096442d,	ASM.Operand.ASMVirtualRegister@2c9f9fb0
+	li		ASM.Operand.ASMVirtualRegister@9f70c54,	0
+	mv		ASM.Operand.ASMVirtualRegister@234bef66,	ASM.Operand.ASMVirtualRegister@9f70c54
+	j		.main.0_for_condition
+.main.0_for_condition:
+	mv		ASM.Operand.ASMVirtualRegister@61dc03ce,	ASM.Operand.ASMVirtualRegister@234bef66
+	li		ASM.Operand.ASMVirtualRegister@50f8360d,	10
+	slt		ASM.Operand.ASMVirtualRegister@13c78c0b,	ASM.Operand.ASMVirtualRegister@61dc03ce,	ASM.Operand.ASMVirtualRegister@50f8360d
+	beqz	ASM.Operand.ASMVirtualRegister@13c78c0b,	.main.0_for_terminate
+	j		.main.0_for_loop
+.main.0_for_loop:
+	li		ASM.Operand.ASMVirtualRegister@12843fce,	0
+	mv		ASM.Operand.ASMVirtualRegister@3dd3bcd,	ASM.Operand.ASMVirtualRegister@12843fce
+	j		.main.1_for_condition
+.main.1_for_condition:
+	mv		ASM.Operand.ASMVirtualRegister@97e1986,	ASM.Operand.ASMVirtualRegister@3dd3bcd
+	li		ASM.Operand.ASMVirtualRegister@26f67b76,	10
+	slt		ASM.Operand.ASMVirtualRegister@153f5a29,	ASM.Operand.ASMVirtualRegister@97e1986,	ASM.Operand.ASMVirtualRegister@26f67b76
+	beqz	ASM.Operand.ASMVirtualRegister@153f5a29,	.main.1_for_terminate
+	j		.main.1_for_loop
+.main.1_for_loop:
+	mv		ASM.Operand.ASMVirtualRegister@7f560810,	ASM.Operand.ASMVirtualRegister@2096442d
+	mv		ASM.Operand.ASMVirtualRegister@69d9c55,	ASM.Operand.ASMVirtualRegister@2096442d
+	li		ASM.Operand.ASMVirtualRegister@13a57a3b,	1
+	add		ASM.Operand.ASMVirtualRegister@7ca48474,	ASM.Operand.ASMVirtualRegister@7f560810,	ASM.Operand.ASMVirtualRegister@13a57a3b
+	mv		ASM.Operand.ASMVirtualRegister@2096442d,	ASM.Operand.ASMVirtualRegister@7ca48474
+	j		.main.1_for_execution
+.main.1_for_execution:
+	mv		ASM.Operand.ASMVirtualRegister@337d0578,	ASM.Operand.ASMVirtualRegister@3dd3bcd
+	mv		ASM.Operand.ASMVirtualRegister@59e84876,	ASM.Operand.ASMVirtualRegister@3dd3bcd
+	li		ASM.Operand.ASMVirtualRegister@61a485d2,	1
+	add		ASM.Operand.ASMVirtualRegister@39fb3ab6,	ASM.Operand.ASMVirtualRegister@337d0578,	ASM.Operand.ASMVirtualRegister@61a485d2
+	mv		ASM.Operand.ASMVirtualRegister@3dd3bcd,	ASM.Operand.ASMVirtualRegister@39fb3ab6
+	j		.main.1_for_condition
+.main.1_for_terminate:
+	j		.main.0_for_execution
+.main.0_for_execution:
+	mv		ASM.Operand.ASMVirtualRegister@6276ae34,	ASM.Operand.ASMVirtualRegister@234bef66
+	mv		ASM.Operand.ASMVirtualRegister@7946e1f4,	ASM.Operand.ASMVirtualRegister@234bef66
+	li		ASM.Operand.ASMVirtualRegister@3c09711b,	1
+	add		ASM.Operand.ASMVirtualRegister@5cc7c2a6,	ASM.Operand.ASMVirtualRegister@6276ae34,	ASM.Operand.ASMVirtualRegister@3c09711b
+	mv		ASM.Operand.ASMVirtualRegister@234bef66,	ASM.Operand.ASMVirtualRegister@5cc7c2a6
+	j		.main.0_for_condition
+.main.0_for_terminate:
+	mv		ASM.Operand.ASMVirtualRegister@b97c004,	ASM.Operand.ASMVirtualRegister@2096442d
+	mv		a0,	ASM.Operand.ASMVirtualRegister@b97c004
+	call	printlnInt
+	li		ASM.Operand.ASMVirtualRegister@32e6e9c3,	0
+	mv		ASM.Operand.ASMVirtualRegister@735b478,	ASM.Operand.ASMVirtualRegister@32e6e9c3
 	j		.main.return
 .main.return:
-	lw		t1,	16(sp)
-	lw		t0,	0(t1)
-	sw		t0,	160(sp)
-	lw		t1,	160(sp)
-	mv		a0,	t1
+	mv		ASM.Operand.ASMVirtualRegister@5056dfcb,	ASM.Operand.ASMVirtualRegister@735b478
+	mv		s0,	ASM.Operand.ASMVirtualRegister@617c74e5
+	mv		s1,	ASM.Operand.ASMVirtualRegister@6537cf78
+	mv		s2,	ASM.Operand.ASMVirtualRegister@67b6d4ae
+	mv		s3,	ASM.Operand.ASMVirtualRegister@34b7bfc0
+	mv		s4,	ASM.Operand.ASMVirtualRegister@366e2eef
+	mv		s5,	ASM.Operand.ASMVirtualRegister@6df97b55
+	mv		s6,	ASM.Operand.ASMVirtualRegister@3cbbc1e0
+	mv		s7,	ASM.Operand.ASMVirtualRegister@35fb3008
+	mv		s8,	ASM.Operand.ASMVirtualRegister@7225790e
+	mv		s9,	ASM.Operand.ASMVirtualRegister@54a097cc
+	mv		s10,	ASM.Operand.ASMVirtualRegister@36f6e879
+	mv		s11,	ASM.Operand.ASMVirtualRegister@5a61f5df
+	mv		a0,	ASM.Operand.ASMVirtualRegister@5056dfcb
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
-	addi	sp,	sp,	164
+	addi	sp,	sp,	0
 	ret
 	.size	main,	.-main
 
 	.section	.bss
-	.globl	n
-	.type	n,@object
-n:
-	.word	0
-	.size	n,	4
-
-	.globl	a
-	.type	a,@object
-a:
-	.word	0
-	.size	a,	4
-
 	.section	.rodata

@@ -1,20 +1,15 @@
 package ASM.Instruction;
 
-import ASM.ASMBlock;
 import ASM.Operand.ASMRegister;
 
 public class ASMBranchInstruction extends ASMInstruction {
-    String op;
-    String toBlock;
+    public String op;
+    public String toBlock;
 
-    public ASMBranchInstruction(String op, String toBlock, ASMRegister rs1, ASMBlock parentBlock) {
-        super(parentBlock);
+    public ASMBranchInstruction(String op, String toBlock, ASMRegister rs1) {
+        super(null, rs1, null, null);
         this.op = op;
         this.toBlock = toBlock;
-        this.rd = null;
-        this.rs1 = rs1;
-        this.rs2 = null;
-        this.imm = null;
     }
 
     @Override

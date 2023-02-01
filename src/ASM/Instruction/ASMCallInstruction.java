@@ -5,8 +5,8 @@ import ASM.ASMBlock;
 public class ASMCallInstruction extends ASMInstruction {
     String funcName;
 
-    public ASMCallInstruction(String funcName, ASMBlock parentBlock) {
-        super(parentBlock);
+    public ASMCallInstruction(String funcName) {
+        super(null, null, null, null);
         this.funcName = funcName;
     }
 

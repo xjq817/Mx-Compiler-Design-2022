@@ -23,22 +23,31 @@ public class ASMBuilder implements IRVisitor {
     public ASMBlock curBlock;
     public ASMGlobalBlock gBlock;
     public ASMFunction curFunction;
+    public ArrayList<ASMVirtualRegister> calleeList;
 
     int parameterSize = 3;
 
-    ASMPhysicalRegister sp = new ASMPhysicalRegister("sp");
-    ASMPhysicalRegister s0 = new ASMPhysicalRegister("s0");
-    ASMPhysicalRegister ra = new ASMPhysicalRegister("ra");
-    ASMPhysicalRegister a0 = new ASMPhysicalRegister("a0");
-    ASMPhysicalRegister t0 = new ASMPhysicalRegister("t0");
-    ASMPhysicalRegister t1 = new ASMPhysicalRegister("t1");
-    ASMPhysicalRegister t2 = new ASMPhysicalRegister("t2");
-    ASMPhysicalRegister t3 = new ASMPhysicalRegister("t3");
+    ASMPhysicalRegister sp;
+    ASMPhysicalRegister s0;
+    ASMPhysicalRegister ra;
+    ASMPhysicalRegister a0;
+    ASMPhysicalRegister t0;
+    ASMPhysicalRegister t1;
+    ASMPhysicalRegister t2;
+    ASMPhysicalRegister t3;
 
     public ASMBuilder(ASMGlobalBlock gBlock) {
         this.gBlock = gBlock;
         this.curBlock = null;
         this.curFunction = null;
+        sp = gBlock.physicalRegs.get(2);
+        s0 = gBlock.physicalRegs.get(8);
+        ra = gBlock.physicalRegs.get(1);
+        a0 = gBlock.physicalRegs.get(10);
+        t0 = gBlock.physicalRegs.get(5);
+        t1 = gBlock.physicalRegs.get(6);
+        t2 = gBlock.physicalRegs.get(7);
+        t3 = gBlock.physicalRegs.get(29);
     }
 
     void funcAlloc(ASMVirtualRegister reg) {
@@ -61,7 +70,7 @@ public class ASMBuilder implements IRVisitor {
             IRRegister reg = (IRRegister) value;
             if (reg.isGlobal) {
                 ASMVirtualRegister virtualReg = new ASMVirtualRegister("global_define");
-                curBlock.instructions.add(new ASMLaInstruction(reg.name, virtualReg, curBlock));
+                curBlock.instructions.add(new ASMLaInstruction(reg.name, virtualReg));
                 return virtualReg;
             }
             if (value.virtualReg != null) return value.virtualReg;
@@ -71,7 +80,8 @@ public class ASMBuilder implements IRVisitor {
         if (value instanceof IRConstString) {
             String name = "str." + ((IRConstString) value).id;
             ASMVirtualRegister virtualReg = new ASMVirtualRegister("str_addr");
-            curBlock.instructions.add(new ASMLaInstruction(name, virtualReg, curBlock));
+            curBlock.instructions.add(new ASMLaInstruction(name, virtualReg));
+            curBlock.instructions.add(new ASMLaInstruction(name, virtualReg));
             return virtualReg;
         }
         ASMVirtualRegister virtualReg = new ASMVirtualRegister("const");
@@ -80,7 +90,7 @@ public class ASMBuilder implements IRVisitor {
         else if (value instanceof IRConstBool) imm = ((IRConstBool) value).value ? 1 : 0;
         else if (value instanceof IRConstNull) imm = 0;
         else throw new ASMError("trans virtual register error.");
-        curBlock.instructions.add(new ASMLiInstruction(virtualReg, new ASMImm(imm), curBlock));
+        curBlock.instructions.add(new ASMLiInstruction(virtualReg, new ASMImm(imm)));
         return virtualReg;
     }
 
@@ -89,13 +99,14 @@ public class ASMBuilder implements IRVisitor {
         ASMVirtualRegister rd = transVReg(it.allocaRegister);
         ASMVirtualRegister newReg = new ASMVirtualRegister("new_vir_reg");
         funcAlloc(newReg);
-        curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(newReg.offset), rd, sp, null, curBlock));
+        curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(newReg.offset), rd, sp, null));
     }
 
     @Override
     public void visit(IRBrInstruction it) {
         ASMVirtualRegister rs1 = transVReg(it.condition);
-        curBlock.instructions.add(new ASMBranchInstruction("beqz", it.elseBlock.label, rs1, curBlock));
+        curBlock.instructions.add(new ASMBranchInstruction("beqz", it.elseBlock.label, rs1));
+        curBlock.instructions.add(new ASMBranchInstruction("j", it.thenBlock.label, null));
     }
 
     @Override
@@ -103,15 +114,17 @@ public class ASMBuilder implements IRVisitor {
         for (int i = 0; i < it.argumentValues.size(); i++) {
             ASMVirtualRegister virtualReg = transVReg(it.argumentValues.get(i));
             if (i < parameterSize)
-                curBlock.instructions.add(new ASMMvInstruction(new ASMPhysicalRegister("a" + i), virtualReg, curBlock));
+                curBlock.instructions.add(new ASMMvInstruction(gBlock.physicalRegs.get(10 + i), virtualReg));
             else
-                curBlock.instructions.add(new ASMStoreInstruction(4, virtualReg, s0, new ASMImm(-4 * (i + 1 - parameterSize)), curBlock));
+                curBlock.instructions.add(new ASMStoreInstruction(4, virtualReg, s0, new ASMImm(-4 * (i + 1 - parameterSize))));
         }
         if ((it.argumentValues.size() - parameterSize) * 4 > curFunction.parameterSize)
             curFunction.parameterSize = (it.argumentValues.size() - parameterSize) * 4;
-        curBlock.instructions.add(new ASMCallInstruction(it.function.name, curBlock));
+        ASMCallInstruction inst = new ASMCallInstruction(it.function.name);
+        inst.def.addAll(gBlock.caller);
+        curBlock.instructions.add(inst);
         if (!(it.type instanceof IRVoidType))
-            curBlock.instructions.add(new ASMMvInstruction(transVReg(it.register), a0, curBlock));
+            curBlock.instructions.add(new ASMMvInstruction(transVReg(it.register), a0));
     }
 
     @Override
@@ -119,14 +132,16 @@ public class ASMBuilder implements IRVisitor {
         ASMVirtualRegister rd, rs1;
         rd = transVReg(it.register);
         rs1 = transVReg(it.loadFrom);
-        curBlock.instructions.add(new ASMLoadInstruction(4, rd, rs1, new ASMImm(0), curBlock));
+        curBlock.instructions.add(new ASMLoadInstruction(4, rd, rs1, new ASMImm(0)));
     }
 
     @Override
     public void visit(IRRetInstruction it) {
+        for (int i = 0; i < gBlock.callee.size(); i++)
+            curBlock.instructions.add(new ASMMvInstruction(gBlock.callee.get(i), calleeList.get(i)));
         if (!(it.retType instanceof IRVoidType)) {
             ASMVirtualRegister rs1 = transVReg(it.retValue);
-            curBlock.instructions.add(new ASMMvInstruction(a0, rs1, curBlock));
+            curBlock.instructions.add(new ASMMvInstruction(a0, rs1));
         }
     }
 
@@ -136,8 +151,8 @@ public class ASMBuilder implements IRVisitor {
         rs1 = transVReg(it.storeVal);
         rs2 = transVReg(it.storeAddr);
         if (it.storeAddr.type.toString().equals(it.storeVal.type.toString()) || it.storeVal.toString().equals("null"))
-            curBlock.instructions.add(new ASMMvInstruction(rs2, rs1, curBlock));
-        else curBlock.instructions.add(new ASMStoreInstruction(4, rs1, rs2, new ASMImm(0), curBlock));
+            curBlock.instructions.add(new ASMMvInstruction(rs2, rs1));
+        else curBlock.instructions.add(new ASMStoreInstruction(4, rs1, rs2, new ASMImm(0)));
     }
 
     @Override
@@ -146,7 +161,7 @@ public class ASMBuilder implements IRVisitor {
         rd = transVReg(it.register);
         rs1 = transVReg(it.lhs);
         rs2 = transVReg(it.rhs);
-        curBlock.instructions.add(new ASMBinaryInstruction(transOp(it.op), null, rd, rs1, rs2, curBlock));
+        curBlock.instructions.add(new ASMBinaryInstruction(transOp(it.op), null, rd, rs1, rs2));
     }
 
     @Override
@@ -156,21 +171,21 @@ public class ASMBuilder implements IRVisitor {
         rs1 = transVReg(it.lhs);
         rs2 = transVReg(it.rhs);
         if (Objects.equals(it.op, "slt")) {
-            curBlock.instructions.add(new ASMCmpInstruction("slt", rd, rs1, rs2, curBlock));
+            curBlock.instructions.add(new ASMCmpInstruction("slt", rd, rs1, rs2));
         } else if (Objects.equals(it.op, "sle")) {
-            curBlock.instructions.add(new ASMCmpInstruction("slt", rd, rs2, rs1, curBlock));
-            curBlock.instructions.add(new ASMCmpInstruction("seqz", rd, rd, null, curBlock));
+            curBlock.instructions.add(new ASMCmpInstruction("slt", rd, rs2, rs1));
+            curBlock.instructions.add(new ASMCmpInstruction("seqz", rd, rd, null));
         } else if (Objects.equals(it.op, "sgt")) {
-            curBlock.instructions.add(new ASMCmpInstruction("slt", rd, rs2, rs1, curBlock));
+            curBlock.instructions.add(new ASMCmpInstruction("slt", rd, rs2, rs1));
         } else if (Objects.equals(it.op, "sge")) {
-            curBlock.instructions.add(new ASMCmpInstruction("slt", rd, rs1, rs2, curBlock));
-            curBlock.instructions.add(new ASMCmpInstruction("seqz", rd, rd, null, curBlock));
+            curBlock.instructions.add(new ASMCmpInstruction("slt", rd, rs1, rs2));
+            curBlock.instructions.add(new ASMCmpInstruction("seqz", rd, rd, null));
         } else if (Objects.equals(it.op, "eq")) {
-            curBlock.instructions.add(new ASMBinaryInstruction("xor", null, rd, rs1, rs2, curBlock));
-            curBlock.instructions.add(new ASMCmpInstruction("seqz", rd, rd, null, curBlock));
+            curBlock.instructions.add(new ASMBinaryInstruction("xor", null, rd, rs1, rs2));
+            curBlock.instructions.add(new ASMCmpInstruction("seqz", rd, rd, null));
         } else if (Objects.equals(it.op, "ne")) {
-            curBlock.instructions.add(new ASMBinaryInstruction("xor", null, rd, rs1, rs2, curBlock));
-            curBlock.instructions.add(new ASMCmpInstruction("snez", rd, rd, null, curBlock));
+            curBlock.instructions.add(new ASMBinaryInstruction("xor", null, rd, rs1, rs2));
+            curBlock.instructions.add(new ASMCmpInstruction("snez", rd, rd, null));
         }
     }
 
@@ -179,7 +194,7 @@ public class ASMBuilder implements IRVisitor {
         ASMVirtualRegister rd, rs1;
         rd = transVReg(it.register);
         rs1 = transVReg(it.value);
-        curBlock.instructions.add(new ASMMvInstruction(rd, rs1, curBlock));
+        curBlock.instructions.add(new ASMMvInstruction(rd, rs1));
     }
 
     @Override
@@ -187,7 +202,7 @@ public class ASMBuilder implements IRVisitor {
         ASMVirtualRegister rd, rs1;
         rd = transVReg(it.register);
         rs1 = transVReg(it.value);
-        curBlock.instructions.add(new ASMMvInstruction(rd, rs1, curBlock));
+        curBlock.instructions.add(new ASMMvInstruction(rd, rs1));
     }
 
     @Override
@@ -198,13 +213,13 @@ public class ASMBuilder implements IRVisitor {
         if (it.values.size() == 1) {
             if (it.values.get(0) instanceof IRConstInt) {
                 int offset = ((IRConstInt) it.values.get(0)).value * it.typeFrom.sizeof();
-                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(offset), rd, rs1, null, curBlock));
+                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(offset), rd, rs1, null));
             } else {
                 rs2 = transVReg(it.values.get(0));
                 tmp = new ASMVirtualRegister("tmp");
-                curBlock.instructions.add(new ASMLiInstruction(tmp, new ASMImm(it.typeFrom.sizeof()), curBlock));
-                curBlock.instructions.add(new ASMBinaryInstruction("mul", null, tmp, tmp, rs2, curBlock));
-                curBlock.instructions.add(new ASMBinaryInstruction("add", null, rd, rs1, tmp, curBlock));
+                curBlock.instructions.add(new ASMLiInstruction(tmp, new ASMImm(it.typeFrom.sizeof())));
+                curBlock.instructions.add(new ASMBinaryInstruction("mul", null, tmp, tmp, rs2));
+                curBlock.instructions.add(new ASMBinaryInstruction("add", null, rd, rs1, tmp));
             }
         } else {
             //the first value must be 0
@@ -212,7 +227,7 @@ public class ASMBuilder implements IRVisitor {
             int offset = 0;
             for (int i = 0; i < id; i++)
                 offset += ((IRStructType) it.typeFrom).typeList.get(i).sizeof();
-            curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(offset), rd, rs1, null, curBlock));
+            curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(offset), rd, rs1, null));
         }
     }
 
@@ -221,12 +236,12 @@ public class ASMBuilder implements IRVisitor {
         ASMVirtualRegister rd, rs1;
         rd = transVReg(it.register);
         rs1 = transVReg(it.value);
-        curBlock.instructions.add(new ASMMvInstruction(rd, rs1, curBlock));
+        curBlock.instructions.add(new ASMMvInstruction(rd, rs1));
     }
 
     @Override
     public void visit(IRBrLabelInstruction it) {
-        curBlock.instructions.add(new ASMBranchInstruction("j", it.toBlock.label, null, curBlock));
+        curBlock.instructions.add(new ASMBranchInstruction("j", it.toBlock.label, null));
     }
 
     ArrayList<ASMInstruction> newInst;
@@ -239,11 +254,11 @@ public class ASMBuilder implements IRVisitor {
         if (!reg.isAlloc) funcAlloc(reg);
         ASMImm imm = new ASMImm(reg.offset);
         if (checkImm(reg.offset))
-            newInst.add(new ASMLoadInstruction(4, t, sp, imm, curBlock));
+            newInst.add(new ASMLoadInstruction(4, t, sp, imm));
         else {
-            newInst.add(new ASMLiInstruction(t3, imm, curBlock));
-            newInst.add(new ASMBinaryInstruction("add", null, t3, t3, sp, curBlock));
-            newInst.add(new ASMLoadInstruction(4, t, t3, new ASMImm(0), curBlock));
+            newInst.add(new ASMLiInstruction(t3, imm));
+            newInst.add(new ASMBinaryInstruction("add", null, t3, t3, sp));
+            newInst.add(new ASMLoadInstruction(4, t, t3, new ASMImm(0)));
         }
     }
 
@@ -251,11 +266,11 @@ public class ASMBuilder implements IRVisitor {
         if (!reg.isAlloc) funcAlloc(reg);
         ASMImm imm = new ASMImm(reg.offset);
         if (checkImm(reg.offset))
-            newInst.add(new ASMStoreInstruction(4, t, sp, imm, curBlock));
+            newInst.add(new ASMStoreInstruction(4, t, sp, imm));
         else {
-            newInst.add(new ASMLiInstruction(t3, imm, curBlock));
-            newInst.add(new ASMBinaryInstruction("add", null, t3, t3, sp, curBlock));
-            newInst.add(new ASMStoreInstruction(4, t, t3, new ASMImm(0), curBlock));
+            newInst.add(new ASMLiInstruction(t3, imm));
+            newInst.add(new ASMBinaryInstruction("add", null, t3, t3, sp));
+            newInst.add(new ASMStoreInstruction(4, t, t3, new ASMImm(0)));
         }
     }
 
@@ -271,6 +286,9 @@ public class ASMBuilder implements IRVisitor {
             }
         });
         //vReg->pReg
+        //new ASMPrinter(System.out).visit(gBlock);
+        new GraphColoring().visit(gBlock);
+/*
         it.functions.forEach((name, func) -> {
             if (!func.declare) {
                 curFunction = gBlock.functions.get(name);
@@ -296,6 +314,7 @@ public class ASMBuilder implements IRVisitor {
                 });
             }
         });
+    */
         //s0 offset need to be allocSize
         it.functions.forEach((name, func) -> {
             if (!func.declare) {
@@ -313,8 +332,8 @@ public class ASMBuilder implements IRVisitor {
                         if (inst instanceof ASMBinaryInstruction
                                 && Objects.equals(((ASMBinaryInstruction) inst).op, "addi")
                                 && !checkImm(inst.imm.imm)) {
-                            newInst.add(new ASMLiInstruction(t0, inst.imm, curBlock));
-                            newInst.add(new ASMBinaryInstruction("add", null, inst.rd, inst.rs1, t0, curBlock));
+                            newInst.add(new ASMLiInstruction(t0, inst.imm));
+                            newInst.add(new ASMBinaryInstruction("add", null, inst.rd, inst.rs1, t0));
                         } else newInst.add(inst);
                     });
                     cur.instructions = newInst;
@@ -336,30 +355,36 @@ public class ASMBuilder implements IRVisitor {
             curFunction.blocks.add(curBlock);
             if (Objects.equals(cur.label, it.name + ".entry")) {
                 curFunction.entryBlock = curBlock;
-                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), sp, sp, null, curBlock));
-                curBlock.instructions.add(new ASMStoreInstruction(4, ra, sp, new ASMImm(4), curBlock));
-                curBlock.instructions.add(new ASMStoreInstruction(4, s0, sp, new ASMImm(0), curBlock));
-                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), s0, sp, null, curBlock));
+                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), sp, sp, null));
+                curBlock.instructions.add(new ASMStoreInstruction(4, ra, sp, new ASMImm(4)));
+                curBlock.instructions.add(new ASMStoreInstruction(4, s0, sp, new ASMImm(0)));
+                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), s0, sp, null));
                 //parameter
+                calleeList = new ArrayList<>();
+                gBlock.callee.forEach(n -> {
+                    ASMVirtualRegister reg = new ASMVirtualRegister("callee");
+                    calleeList.add(reg);
+                    curBlock.instructions.add(new ASMMvInstruction(reg, n));
+                });
                 ASMVirtualRegister virS0 = new ASMVirtualRegister("vir_s0");
                 for (int i = 0; i < it.parameterRegs.size(); i++) {
                     ASMVirtualRegister rd = transVReg(it.parameterRegs.get(i));
                     if (i < parameterSize)
-                        curBlock.instructions.add(new ASMMvInstruction(rd, new ASMPhysicalRegister("a" + i), curBlock));
+                        curBlock.instructions.add(new ASMMvInstruction(rd, gBlock.physicalRegs.get(10 + i)));
                     else {
                         if (i == parameterSize)
-                            curBlock.instructions.add(new ASMLoadInstruction(4, virS0, sp, new ASMImm(0), curBlock));
-                        curBlock.instructions.add(new ASMLoadInstruction(4, rd, virS0, new ASMImm(-4 * (i + 1 - parameterSize)), curBlock));
+                            curBlock.instructions.add(new ASMLoadInstruction(4, virS0, sp, new ASMImm(0)));
+                        curBlock.instructions.add(new ASMLoadInstruction(4, rd, virS0, new ASMImm(-4 * (i + 1 - parameterSize))));
                     }
                 }
             }
             cur.accept(this);
             if (Objects.equals(cur.label, it.name + ".return")) {
                 curFunction.returnBlock = curBlock;
-                curBlock.instructions.add(new ASMLoadInstruction(4, ra, sp, new ASMImm(4), curBlock));
-                curBlock.instructions.add(new ASMLoadInstruction(4, s0, sp, new ASMImm(0), curBlock));
-                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), sp, sp, null, curBlock));
-                curBlock.instructions.add(new ASMRetInstruction(curBlock));
+                curBlock.instructions.add(new ASMLoadInstruction(4, ra, sp, new ASMImm(4)));
+                curBlock.instructions.add(new ASMLoadInstruction(4, s0, sp, new ASMImm(0)));
+                curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(0), sp, sp, null));
+                curBlock.instructions.add(new ASMRetInstruction());
             }
         });
     }

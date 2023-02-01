@@ -1,18 +1,13 @@
 package ASM.Instruction;
 
-import ASM.ASMBlock;
 import ASM.Operand.ASMImm;
 import ASM.Operand.ASMRegister;
 
 public class ASMLoadInstruction extends ASMInstruction {
     int bit;
 
-    public ASMLoadInstruction(int bit, ASMRegister rd, ASMRegister rs1, ASMImm imm, ASMBlock parentBlock) {
-        super(parentBlock);
-        this.rd = rd;
-        this.rs1 = rs1;
-        this.rs2 = null;
-        this.imm = imm;
+    public ASMLoadInstruction(int bit, ASMRegister rd, ASMRegister rs1, ASMImm imm) {
+        super(rd, rs1, null, imm);
         this.bit = bit;
     }
 

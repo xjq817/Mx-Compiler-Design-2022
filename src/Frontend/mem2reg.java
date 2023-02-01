@@ -32,7 +32,6 @@ public class mem2reg implements IRVisitor {
     @Override
     public void visit(IRAllocaInstruction it) {
         IRRegister tmp = new IRRegister(it.allocaType, "__tmp");
-        tmp.isTmp = true;
         tmpMap.put(it.allocaRegister.toString(), tmp);
     }
 
@@ -56,7 +55,6 @@ public class mem2reg implements IRVisitor {
         if (it.loadFrom instanceof IRRegister && tmpMap.containsKey(it.loadFrom.toString())) {
             IRRegister tmp = tmpMap.get(it.loadFrom.toString());
             IRRegister newTmp = new IRRegister(tmp.type, "__tmp");
-            newTmp.isTmp = true;
             tmpMap.put(it.register.toString(), newTmp);
             newInst.add(new IRStoreInstruction(tmp.type, newTmp, tmp, curBlock));
         } else newInst.add(it);

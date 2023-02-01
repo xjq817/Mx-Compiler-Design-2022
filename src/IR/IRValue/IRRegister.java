@@ -7,14 +7,12 @@ public class IRRegister extends IRValue {
     public int id;
     public String name;
     public boolean isGlobal;
-    public boolean isTmp;
 
     public IRRegister(IRType type, String name) {
         super(type);
         this.id = regCnt++;
         this.name = name;
         this.isGlobal = false;
-        this.isTmp = false;
     }
 
     @Override
