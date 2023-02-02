@@ -16,6 +16,7 @@ import IR.Instruction.*;
 import Util.error.ASMError;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Objects;
 
 public class ASMBuilder implements IRVisitor {
@@ -295,6 +296,8 @@ public class ASMBuilder implements IRVisitor {
         //vReg->pReg
 
         //new ASMPrinter(System.out).visit(gBlock);
+
+        new elimination().visit(gBlock);
 
         new GraphColoring().visit(gBlock);
 /*

@@ -4,7 +4,7 @@ import ASM.Operand.ASMImm;
 import ASM.Operand.ASMRegister;
 
 public class ASMLoadInstruction extends ASMInstruction {
-    int bit;
+    public int bit;
 
     public ASMLoadInstruction(int bit, ASMRegister rd, ASMRegister rs1, ASMImm imm) {
         super(rd, rs1, null, imm);

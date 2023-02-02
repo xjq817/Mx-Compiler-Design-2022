@@ -3,7 +3,7 @@ package ASM.Instruction;
 import ASM.Operand.ASMRegister;
 
 public class ASMLaInstruction extends ASMInstruction {
-    String name;
+    public String name;
 
     public ASMLaInstruction(String name, ASMRegister rd) {
         super(rd, null, null, null);

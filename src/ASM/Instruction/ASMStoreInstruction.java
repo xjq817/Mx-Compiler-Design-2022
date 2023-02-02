@@ -4,7 +4,7 @@ import ASM.Operand.ASMImm;
 import ASM.Operand.ASMRegister;
 
 public class ASMStoreInstruction extends ASMInstruction {
-    int bit;
+    public int bit;
 
     public ASMStoreInstruction(int bit, ASMRegister rs1, ASMRegister rs2, ASMImm imm) {
         super(null, rs1, rs2, imm);

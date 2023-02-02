@@ -5,105 +5,122 @@
 
 EdgeList.init:
 .EdgeList.init.entry:
-	addi	sp,	sp,	-24
+	addi	sp,	sp,	-28
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
-	addi	s0,	sp,	24
-	sw		s0,	20(sp)
-	sw		s5,	8(sp)
-	sw		s6,	12(sp)
-	sw		s7,	16(sp)
-	mv		s5,	a0
-	mv		s0,	a1
-	mv		s6,	a2
+	addi	s0,	sp,	28
+	mv		t0,	s1
+	sw		t0,	8(sp)
+	mv		t0,	s2
+	sw		t0,	12(sp)
+	mv		t0,	s3
+	sw		t0,	24(sp)
+	mv		t0,	s5
+	sw		t0,	16(sp)
+	mv		t0,	s6
+	sw		t0,	20(sp)
+	mv		s3,	a0
+	mv		s2,	a1
+	mv		s1,	a2
 	li		t0,	4
-	mul		t1,	s6,	t0
+	mul		t1,	s1,	t0
 	li		t0,	4
 	add		a0,	t1,	t0
 	call	__malloc
-	sw		s6,	0(a0)
+	sw		s1,	0(a0)
 	addi	t1,	a0,	4
-	mv		t0,	s5
+	mv		t0,	s3
 	addi	t0,	t0,	0
 	sw		t1,	0(t0)
 	li		t0,	4
-	mul		t0,	s6,	t0
+	mul		t0,	s1,	t0
 	li		t1,	4
 	add		a0,	t0,	t1
 	call	__malloc
-	sw		s6,	0(a0)
+	sw		s1,	0(a0)
 	addi	t1,	a0,	4
-	mv		t0,	s5
+	mv		t0,	s3
 	addi	t0,	t0,	4
 	sw		t1,	0(t0)
 	li		t0,	4
-	mul		t1,	s0,	t0
+	mul		t1,	s2,	t0
 	li		t0,	4
 	add		a0,	t1,	t0
 	call	__malloc
-	sw		s0,	0(a0)
+	sw		s2,	0(a0)
 	addi	t1,	a0,	4
-	mv		t0,	s5
+	mv		t0,	s3
 	addi	t0,	t0,	8
 	sw		t1,	0(t0)
 	mv		t1,	zero
 	j		.EdgeList.init.0_for_condition
 .EdgeList.init.0_for_condition:
-	mv		t0,	s6
+	mv		t0,	s1
 	slt		t0,	t1,	t0
 	beqz	t0,	.EdgeList.init.0_for_terminate
 	j		.EdgeList.init.0_for_loop
 .EdgeList.init.0_for_loop:
+	mv		t0,	s3
+	addi	s5,	t0,	4
 	mv		t0,	s5
-	addi	t0,	t0,	4
-	lw		t0,	0(t0)
-	li		t2,	4
-	mul		t2,	t2,	t1
-	add		t2,	t0,	t2
+	lw		t2,	0(t0)
+	li		t0,	4
+	mul		s5,	t0,	t1
+	mv		t0,	s5
+	add		t2,	t2,	t0
 	li		t0,	1
-	sub		t0,	zero,	t0
+	sub		s5,	zero,	t0
+	mv		t0,	s5
 	sw		t0,	0(t2)
 	j		.EdgeList.init.0_for_execution
 .EdgeList.init.0_for_execution:
 	li		t0,	1
-	add		t1,	t1,	t0
+	add		s5,	t1,	t0
+	mv		t1,	s5
 	j		.EdgeList.init.0_for_condition
 .EdgeList.init.0_for_terminate:
 	mv		t1,	zero
 	j		.EdgeList.init.1_for_condition
 .EdgeList.init.1_for_condition:
-	mv		t0,	s0
-	slt		t0,	t1,	t0
+	mv		t0,	s2
+	slt		s5,	t1,	t0
+	mv		t0,	s5
 	beqz	t0,	.EdgeList.init.1_for_terminate
 	j		.EdgeList.init.1_for_loop
 .EdgeList.init.1_for_loop:
+	mv		t0,	s3
+	addi	s5,	t0,	8
 	mv		t0,	s5
-	addi	t0,	t0,	8
 	lw		t2,	0(t0)
 	li		t0,	4
-	mul		t0,	t0,	t1
+	mul		s5,	t0,	t1
+	mv		t0,	s5
 	add		t2,	t2,	t0
 	li		t0,	1
-	sub		t0,	zero,	t0
+	sub		s5,	zero,	t0
+	mv		t0,	s5
 	sw		t0,	0(t2)
 	j		.EdgeList.init.1_for_execution
 .EdgeList.init.1_for_execution:
 	li		t0,	1
-	add		t1,	t1,	t0
+	add		s5,	t1,	t0
+	mv		t1,	s5
 	j		.EdgeList.init.1_for_condition
 .EdgeList.init.1_for_terminate:
+	mv		t0,	s3
+	addi	s5,	t0,	12
 	mv		t0,	s5
-	addi	t0,	t0,	12
 	sw		zero,	0(t0)
 	j		.EdgeList.init.return
 .EdgeList.init.return:
-	lw		s0,	20(sp)
-	lw		s5,	8(sp)
-	lw		s6,	12(sp)
-	lw		s7,	16(sp)
+	lw		s1,	8(sp)
+	lw		s2,	12(sp)
+	lw		s3,	24(sp)
+	lw		s5,	16(sp)
+	lw		s6,	20(sp)
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
-	addi	sp,	sp,	24
+	addi	sp,	sp,	28
 	ret
 	.size	EdgeList.init,	.-EdgeList.init
 
@@ -444,12 +461,16 @@ Array_Node.size:
 
 Array_Node.resize:
 .Array_Node.resize.entry:
-	addi	sp,	sp,	-16
+	addi	sp,	sp,	-20
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
-	addi	s0,	sp,	16
-	sw		s3,	8(sp)
-	sw		s6,	12(sp)
+	addi	s0,	sp,	20
+	mv		t0,	s3
+	sw		t0,	8(sp)
+	mv		t0,	s6
+	sw		t0,	12(sp)
+	mv		t0,	s11
+	sw		t0,	16(sp)
 	mv		s3,	a0
 	mv		s6,	a1
 	j		.Array_Node.resize.3_while_condition
@@ -470,15 +491,17 @@ Array_Node.resize:
 .Array_Node.resize.3_while_terminate:
 	mv		t0,	s6
 	mv		t1,	s3
-	addi	t1,	t1,	4
+	addi	s11,	t1,	4
+	mv		t1,	s11
 	sw		t0,	0(t1)
 	j		.Array_Node.resize.return
 .Array_Node.resize.return:
 	lw		s3,	8(sp)
 	lw		s6,	12(sp)
+	lw		s11,	16(sp)
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
-	addi	sp,	sp,	16
+	addi	sp,	sp,	20
 	ret
 	.size	Array_Node.resize,	.-Array_Node.resize
 
@@ -582,86 +605,99 @@ Array_Node.doubleStorage:
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
 	addi	s0,	sp,	28
-	sw		s1,	8(sp)
-	sw		s3,	12(sp)
-	sw		s5,	16(sp)
-	sw		s9,	24(sp)
-	sw		s10,	20(sp)
-	mv		s9,	a0
+	mv		t0,	s3
+	sw		t0,	8(sp)
+	mv		t0,	s4
+	sw		t0,	12(sp)
+	mv		t0,	s8
+	sw		t0,	16(sp)
 	mv		t0,	s9
+	sw		t0,	20(sp)
+	mv		t0,	s11
+	sw		t0,	24(sp)
+	mv		s4,	a0
+	mv		t0,	s4
 	addi	t0,	t0,	0
 	lw		t0,	0(t0)
-	mv		s3,	t0
-	mv		t0,	s9
+	mv		s8,	t0
+	mv		t0,	s4
 	addi	t0,	t0,	4
 	lw		t0,	0(t0)
-	mv		s5,	t0
-	mv		t0,	s3
+	mv		s9,	t0
+	mv		t0,	s8
 	addi	t0,	t0,	-4
 	lw		t1,	0(t0)
 	li		t0,	2
-	mul		s1,	t1,	t0
+	mul		s3,	t1,	t0
 	li		t0,	4
-	mul		t1,	s1,	t0
+	mul		t1,	s3,	t0
 	li		t0,	4
 	add		a0,	t1,	t0
 	call	__malloc
-	sw		s1,	0(a0)
+	sw		s3,	0(a0)
 	addi	t1,	a0,	4
-	mv		t0,	s9
+	mv		t0,	s4
 	addi	t0,	t0,	0
 	sw		t1,	0(t0)
-	mv		t0,	s9
+	mv		t0,	s4
 	addi	t0,	t0,	4
 	sw		zero,	0(t0)
 	j		.Array_Node.doubleStorage.4_for_condition
 .Array_Node.doubleStorage.4_for_condition:
-	mv		t0,	s9
+	mv		t0,	s4
 	addi	t0,	t0,	4
 	lw		t1,	0(t0)
-	mv		t0,	s5
+	mv		t0,	s9
 	xor		t0,	t1,	t0
 	snez	t0,	t0
 	beqz	t0,	.Array_Node.doubleStorage.4_for_terminate
 	j		.Array_Node.doubleStorage.4_for_loop
 .Array_Node.doubleStorage.4_for_loop:
-	mv		t0,	s9
-	addi	t0,	t0,	4
+	mv		t0,	s4
+	addi	s11,	t0,	4
+	mv		t0,	s11
 	lw		t1,	0(t0)
-	mv		t0,	s9
-	addi	t0,	t0,	0
+	mv		t0,	s4
+	addi	s11,	t0,	0
+	mv		t0,	s11
 	lw		t2,	0(t0)
 	li		t0,	4
-	mul		t0,	t0,	t1
-	add		t2,	t2,	t0
-	mv		t0,	s9
-	addi	t0,	t0,	4
-	lw		t1,	0(t0)
-	mv		t0,	s3
-	li		s1,	4
-	mul		s1,	s1,	t1
-	add		t0,	t0,	s1
+	mul		s11,	t0,	t1
+	mv		t0,	s11
+	add		a0,	t2,	t0
+	mv		t0,	s4
+	addi	s11,	t0,	4
+	mv		t0,	s11
+	lw		t2,	0(t0)
+	mv		t0,	s8
+	li		t1,	4
+	mul		s11,	t1,	t2
+	mv		t1,	s11
+	add		t0,	t0,	t1
 	lw		t0,	0(t0)
-	sw		t0,	0(t2)
+	sw		t0,	0(a0)
 	j		.Array_Node.doubleStorage.4_for_execution
 .Array_Node.doubleStorage.4_for_execution:
-	mv		t0,	s9
-	addi	t0,	t0,	4
-	lw		t1,	0(t0)
-	mv		t0,	s9
-	addi	t0,	t0,	4
-	li		t2,	1
-	add		t1,	t1,	t2
+	mv		t0,	s4
+	addi	s11,	t0,	4
+	mv		t0,	s11
+	lw		t2,	0(t0)
+	mv		t0,	s4
+	addi	s11,	t0,	4
+	mv		t0,	s11
+	li		t1,	1
+	add		s11,	t2,	t1
+	mv		t1,	s11
 	sw		t1,	0(t0)
 	j		.Array_Node.doubleStorage.4_for_condition
 .Array_Node.doubleStorage.4_for_terminate:
 	j		.Array_Node.doubleStorage.return
 .Array_Node.doubleStorage.return:
-	lw		s1,	8(sp)
-	lw		s3,	12(sp)
-	lw		s5,	16(sp)
-	lw		s9,	24(sp)
-	lw		s10,	20(sp)
+	lw		s3,	8(sp)
+	lw		s4,	12(sp)
+	lw		s8,	16(sp)
+	lw		s9,	20(sp)
+	lw		s11,	24(sp)
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
 	addi	sp,	sp,	28
@@ -709,11 +745,16 @@ Heap_Node.push:
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
 	addi	s0,	sp,	28
-	sw		s2,	8(sp)
-	sw		s3,	12(sp)
-	sw		s4,	24(sp)
-	sw		s7,	16(sp)
-	sw		s8,	20(sp)
+	mv		t0,	s2
+	sw		t0,	8(sp)
+	mv		t0,	s3
+	sw		t0,	12(sp)
+	mv		t0,	s7
+	sw		t0,	16(sp)
+	mv		t0,	s8
+	sw		t0,	20(sp)
+	mv		t0,	s9
+	sw		t0,	24(sp)
 	mv		s3,	a0
 	mv		t0,	s3
 	addi	t0,	t0,	0
@@ -734,21 +775,24 @@ Heap_Node.push:
 	mv		a0,	s3
 	mv		a1,	s2
 	call	Heap_Node.pnt
-	mv		s7,	a0
+	mv		s8,	a0
 	mv		t0,	s3
-	addi	t0,	t0,	0
+	addi	s9,	t0,	0
+	mv		t0,	s9
 	lw		a0,	0(t0)
-	mv		a1,	s7
+	mv		a1,	s8
 	call	Array_Node.get
 	call	Node.key_
-	mv		s4,	a0
+	mv		s7,	a0
 	mv		t0,	s3
-	addi	t0,	t0,	0
+	addi	s9,	t0,	0
+	mv		t0,	s9
 	lw		a0,	0(t0)
 	mv		a1,	s2
 	call	Array_Node.get
 	call	Node.key_
-	slt		t0,	s4,	a0
+	slt		s9,	s7,	a0
+	mv		t0,	s9
 	seqz	t0,	t0
 	beqz	t0,	.Heap_Node.push.6_if_terminate
 	j		.Heap_Node.push.6_if_true
@@ -756,12 +800,13 @@ Heap_Node.push:
 	j		.Heap_Node.push.5_while_terminate
 .Heap_Node.push.6_if_terminate:
 	mv		t0,	s3
-	addi	t0,	t0,	0
+	addi	s9,	t0,	0
+	mv		t0,	s9
 	lw		a0,	0(t0)
-	mv		a1,	s7
+	mv		a1,	s8
 	mv		a2,	s2
 	call	Array_Node.swap
-	mv		t0,	s7
+	mv		t0,	s8
 	mv		s2,	t0
 	j		.Heap_Node.push.5_while_condition
 .Heap_Node.push.5_while_terminate:
@@ -769,9 +814,9 @@ Heap_Node.push:
 .Heap_Node.push.return:
 	lw		s2,	8(sp)
 	lw		s3,	12(sp)
-	lw		s4,	24(sp)
 	lw		s7,	16(sp)
 	lw		s8,	20(sp)
+	lw		s9,	24(sp)
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
 	addi	sp,	sp,	28
@@ -946,92 +991,105 @@ Heap_Node.maxHeapify:
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
 	addi	s0,	sp,	40
-	sw		s0,	8(sp)
-	sw		s1,	12(sp)
-	sw		s2,	16(sp)
-	sw		s3,	20(sp)
-	sw		s5,	24(sp)
-	sw		s6,	28(sp)
-	sw		s7,	36(sp)
-	sw		s8,	32(sp)
+	mv		t0,	s0
+	sw		t0,	8(sp)
+	mv		t0,	s1
+	sw		t0,	12(sp)
+	mv		t0,	s2
+	sw		t0,	16(sp)
+	mv		t0,	s3
+	sw		t0,	20(sp)
+	mv		t0,	s5
+	sw		t0,	24(sp)
+	mv		t0,	s6
+	sw		t0,	28(sp)
+	mv		t0,	s7
+	sw		t0,	32(sp)
+	mv		t0,	s8
+	sw		t0,	36(sp)
 	mv		s7,	a0
 	mv		s6,	a1
 	mv		a0,	s7
 	mv		a1,	s6
 	call	Heap_Node.lchild
-	mv		s5,	a0
+	mv		s8,	a0
 	mv		a0,	s7
 	mv		a1,	s6
 	call	Heap_Node.rchild
-	mv		s2,	a0
+	mv		s0,	a0
 	mv		t0,	s6
-	mv		s3,	t0
-	mv		s0,	s5
+	mv		s5,	t0
+	mv		s1,	s8
 	mv		a0,	s7
 	call	Heap_Node.size
-	slt		s0,	s0,	a0
-	mv		t0,	s0
-	beqz	s0,	.Heap_Node.maxHeapify.7_and_terminate_block
+	slt		s1,	s1,	a0
+	mv		t0,	s1
+	beqz	s1,	.Heap_Node.maxHeapify.7_and_terminate_block
 	j		.Heap_Node.maxHeapify.7_and_rhs_block
 .Heap_Node.maxHeapify.7_and_rhs_block:
+	mv		t0,	s7
+	addi	t0,	t0,	0
+	lw		a0,	0(t0)
+	mv		a1,	s8
+	call	Array_Node.get
+	call	Node.key_
+	mv		s3,	a0
 	mv		t0,	s7
 	addi	t0,	t0,	0
 	lw		a0,	0(t0)
 	mv		a1,	s5
 	call	Array_Node.get
 	call	Node.key_
-	mv		s1,	a0
-	mv		t0,	s7
-	addi	t0,	t0,	0
-	lw		a0,	0(t0)
-	mv		a1,	s3
-	call	Array_Node.get
-	call	Node.key_
-	slt		t0,	a0,	s1
-	and		t0,	s0,	t0
+	slt		t0,	a0,	s3
+	and		t0,	s1,	t0
 	j		.Heap_Node.maxHeapify.7_and_terminate_block
 .Heap_Node.maxHeapify.7_and_terminate_block:
 	beqz	t0,	.Heap_Node.maxHeapify.8_if_terminate
 	j		.Heap_Node.maxHeapify.8_if_true
 .Heap_Node.maxHeapify.8_if_true:
-	mv		t0,	s5
-	mv		s3,	t0
+	mv		t0,	s8
+	mv		s5,	t0
 	j		.Heap_Node.maxHeapify.8_if_terminate
 .Heap_Node.maxHeapify.8_if_terminate:
-	mv		s0,	s2
 	mv		a0,	s7
 	call	Heap_Node.size
-	slt		s1,	s0,	a0
-	beqz	s1,	.Heap_Node.maxHeapify.9_and_terminate_block
+	slt		s2,	s0,	a0
+	mv		s3,	s2
+	mv		t0,	s3
+	beqz	s3,	.Heap_Node.maxHeapify.9_and_terminate_block
 	j		.Heap_Node.maxHeapify.9_and_rhs_block
 .Heap_Node.maxHeapify.9_and_rhs_block:
 	mv		t0,	s7
-	addi	t0,	t0,	0
+	addi	s2,	t0,	0
+	mv		t0,	s2
 	lw		a0,	0(t0)
-	mv		a1,	s2
+	mv		a1,	s0
 	call	Array_Node.get
 	call	Node.key_
-	mv		s0,	a0
+	mv		s1,	a0
 	mv		t0,	s7
-	addi	t0,	t0,	0
+	addi	s2,	t0,	0
+	mv		t0,	s2
 	lw		a0,	0(t0)
-	mv		a1,	s3
+	mv		a1,	s5
 	call	Array_Node.get
 	call	Node.key_
-	slt		t0,	a0,	s0
-	and		s1,	s1,	t0
+	slt		s2,	a0,	s1
+	mv		t0,	s2
+	and		t0,	s3,	t0
 	j		.Heap_Node.maxHeapify.9_and_terminate_block
 .Heap_Node.maxHeapify.9_and_terminate_block:
-	beqz	s1,	.Heap_Node.maxHeapify.10_if_terminate
+	beqz	t0,	.Heap_Node.maxHeapify.10_if_terminate
 	j		.Heap_Node.maxHeapify.10_if_true
 .Heap_Node.maxHeapify.10_if_true:
-	mv		t0,	s2
-	mv		s3,	t0
+	mv		t0,	s0
+	mv		s5,	t0
 	j		.Heap_Node.maxHeapify.10_if_terminate
 .Heap_Node.maxHeapify.10_if_terminate:
-	mv		t1,	s3
+	mv		t1,	s5
 	mv		t0,	s6
-	xor		t0,	t1,	t0
+	xor		s2,	t1,	t0
+	mv		t0,	s2
 	seqz	t0,	t0
 	beqz	t0,	.Heap_Node.maxHeapify.11_if_terminate
 	j		.Heap_Node.maxHeapify.11_if_true
@@ -1039,13 +1097,14 @@ Heap_Node.maxHeapify:
 	j		.Heap_Node.maxHeapify.return
 .Heap_Node.maxHeapify.11_if_terminate:
 	mv		t0,	s7
-	addi	t0,	t0,	0
+	addi	s2,	t0,	0
+	mv		t0,	s2
 	lw		a0,	0(t0)
 	mv		a1,	s6
-	mv		a2,	s3
+	mv		a2,	s5
 	call	Array_Node.swap
 	mv		a0,	s7
-	mv		a1,	s3
+	mv		a1,	s5
 	call	Heap_Node.maxHeapify
 	j		.Heap_Node.maxHeapify.return
 .Heap_Node.maxHeapify.return:
@@ -1055,8 +1114,8 @@ Heap_Node.maxHeapify:
 	lw		s3,	20(sp)
 	lw		s5,	24(sp)
 	lw		s6,	28(sp)
-	lw		s7,	36(sp)
-	lw		s8,	32(sp)
+	lw		s7,	32(sp)
+	lw		s8,	36(sp)
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
 	addi	sp,	sp,	40
@@ -1090,14 +1149,20 @@ Node.key_:
 
 init:
 .init.entry:
-	addi	sp,	sp,	-24
+	addi	sp,	sp,	-28
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
-	addi	s0,	sp,	24
-	sw		s4,	8(sp)
-	sw		s5,	12(sp)
-	sw		s6,	20(sp)
-	sw		s7,	16(sp)
+	addi	s0,	sp,	28
+	mv		t0,	s4
+	sw		t0,	8(sp)
+	mv		t0,	s5
+	sw		t0,	12(sp)
+	mv		t0,	s6
+	sw		t0,	24(sp)
+	mv		t0,	s7
+	sw		t0,	16(sp)
+	mv		t0,	s9
+	sw		t0,	20(sp)
 	call	getInt
 	la		t0,	n
 	sw		a0,	0(t0)
@@ -1115,10 +1180,10 @@ init:
 	la		t0,	m
 	lw		a2,	0(t0)
 	call	EdgeList.init
-	mv		s6,	zero
+	mv		s4,	zero
 	j		.init.12_for_condition
 .init.12_for_condition:
-	mv		t0,	s6
+	mv		t0,	s4
 	la		t1,	m
 	lw		t1,	0(t1)
 	slt		t0,	t0,	t1
@@ -1126,33 +1191,34 @@ init:
 	j		.init.12_for_loop
 .init.12_for_loop:
 	call	getInt
-	mv		s4,	a0
-	call	getInt
 	mv		s5,	a0
+	call	getInt
+	mv		s6,	a0
 	call	getInt
 	mv		a3,	a0
 	la		t0,	g
 	lw		a0,	0(t0)
-	mv		a1,	s4
-	mv		a2,	s5
+	mv		a1,	s5
+	mv		a2,	s6
 	call	EdgeList.addEdge
 	j		.init.12_for_execution
 .init.12_for_execution:
-	mv		t0,	s6
-	li		t1,	1
-	add		t0,	t0,	t1
-	mv		s6,	t0
+	li		t0,	1
+	add		s7,	s4,	t0
+	mv		t0,	s7
+	mv		s4,	t0
 	j		.init.12_for_condition
 .init.12_for_terminate:
 	j		.init.return
 .init.return:
 	lw		s4,	8(sp)
 	lw		s5,	12(sp)
-	lw		s6,	20(sp)
+	lw		s6,	24(sp)
 	lw		s7,	16(sp)
+	lw		s9,	20(sp)
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
-	addi	sp,	sp,	24
+	addi	sp,	sp,	28
 	ret
 	.size	init,	.-init
 
@@ -1166,214 +1232,259 @@ dijkstra:
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
 	addi	s0,	sp,	36
-	sw		s0,	32(sp)
-	sw		s1,	8(sp)
-	sw		s2,	12(sp)
-	sw		s3,	16(sp)
-	sw		s4,	20(sp)
-	sw		s5,	24(sp)
-	sw		s9,	28(sp)
-	mv		s0,	a0
+	sw		s0,	8(sp)
+	sw		s1,	12(sp)
+	sw		s2,	16(sp)
+	sw		s3,	20(sp)
+	mv		t0,	s4
+	sw		t0,	24(sp)
+	mv		t0,	s5
+	sw		t0,	28(sp)
+	mv		t0,	s6
+	sw		t0,	32(sp)
+	mv		s1,	a0
 	la		t0,	n
-	lw		s1,	0(t0)
+	lw		s0,	0(t0)
 	li		t0,	4
-	mul		t0,	s1,	t0
+	mul		t0,	s0,	t0
 	li		t1,	4
 	add		a0,	t0,	t1
 	call	__malloc
-	sw		s1,	0(a0)
+	sw		s0,	0(a0)
 	addi	t0,	a0,	4
-	mv		s1,	t0
+	mv		s6,	t0
 	la		t0,	n
-	lw		s2,	0(t0)
+	lw		s0,	0(t0)
 	li		t0,	4
-	mul		t0,	s2,	t0
+	mul		t0,	s0,	t0
 	li		t1,	4
 	add		a0,	t0,	t1
 	call	__malloc
-	sw		s2,	0(a0)
+	sw		s0,	0(a0)
 	addi	t0,	a0,	4
 	mv		s5,	t0
-	mv		t1,	zero
+	mv		t0,	zero
 	j		.dijkstra.13_for_condition
 .dijkstra.13_for_condition:
-	la		t0,	n
-	lw		t0,	0(t0)
-	slt		t0,	t1,	t0
-	beqz	t0,	.dijkstra.13_for_terminate
+	la		t1,	n
+	lw		t1,	0(t1)
+	slt		t1,	t0,	t1
+	beqz	t1,	.dijkstra.13_for_terminate
 	j		.dijkstra.13_for_loop
 .dijkstra.13_for_loop:
-	mv		t0,	s5
-	li		t2,	4
-	mul		t2,	t2,	t1
-	add		t2,	t0,	t2
-	la		t0,	INF
-	lw		t0,	0(t0)
-	sw		t0,	0(t2)
-	mv		t0,	s1
-	li		t2,	4
-	mul		t2,	t2,	t1
-	add		t0,	t0,	t2
-	sw		zero,	0(t0)
+	mv		t2,	s5
+	li		t1,	4
+	mul		s4,	t1,	t0
+	mv		t1,	s4
+	add		t1,	t2,	t1
+	la		t2,	INF
+	lw		t2,	0(t2)
+	sw		t2,	0(t1)
+	mv		t2,	s6
+	li		t1,	4
+	mul		s4,	t1,	t0
+	mv		t1,	s4
+	add		t1,	t2,	t1
+	sw		zero,	0(t1)
 	j		.dijkstra.13_for_execution
 .dijkstra.13_for_execution:
-	li		t0,	1
-	add		t1,	t1,	t0
+	li		t1,	1
+	add		s4,	t0,	t1
+	mv		t0,	s4
 	j		.dijkstra.13_for_condition
 .dijkstra.13_for_terminate:
-	mv		t0,	s5
-	li		t1,	4
-	mul		t1,	t1,	s0
-	add		t0,	t0,	t1
+	mv		t2,	s1
+	mv		t1,	s5
+	li		t0,	4
+	mul		s4,	t0,	t2
+	mv		t0,	s4
+	add		t0,	t1,	t0
 	sw		zero,	0(t0)
 	li		a0,	4
 	call	__malloc
-	mv		s2,	a0
-	mv		a0,	s2
+	mv		s0,	a0
+	mv		a0,	s0
 	call	Heap_Node.__cons
-	mv		s4,	s2
 	li		a0,	8
 	call	__malloc
-	mv		a1,	a0
-	addi	t0,	a1,	4
+	mv		t0,	a0
+	addi	s4,	t0,	4
+	mv		t0,	s4
 	sw		zero,	0(t0)
-	addi	t0,	a1,	0
-	sw		s0,	0(t0)
-	mv		a0,	s4
+	mv		t0,	a0
+	addi	s4,	t0,	0
+	mv		t0,	s4
+	mv		t1,	s1
+	sw		t1,	0(t0)
+	mv		t0,	s0
+	mv		a1,	a0
+	mv		a0,	t0
 	call	Heap_Node.push
 	j		.dijkstra.14_while_condition
 .dijkstra.14_while_condition:
-	mv		a0,	s4
+	mv		a0,	s0
 	call	Heap_Node.size
-	xor		t0,	a0,	zero
+	xor		s4,	a0,	zero
+	mv		t0,	s4
 	snez	t0,	t0
 	beqz	t0,	.dijkstra.14_while_terminate
 	j		.dijkstra.14_while_loop
 .dijkstra.14_while_loop:
-	mv		a0,	s4
+	mv		a0,	s0
 	call	Heap_Node.pop
 	mv		a1,	a0
-	addi	t0,	a1,	0
+	mv		t0,	a1
+	addi	s4,	t0,	0
+	mv		t0,	s4
 	lw		t0,	0(t0)
 	mv		s2,	t0
-	mv		t1,	s2
-	mv		t0,	s1
-	li		t2,	4
-	mul		t2,	t2,	t1
-	add		t0,	t0,	t2
-	lw		t0,	0(t0)
-	li		t1,	1
-	xor		t0,	t0,	t1
+	mv		t2,	s2
+	mv		t0,	s6
+	li		t1,	4
+	mul		s4,	t1,	t2
+	mv		t1,	s4
+	add		t0,	t0,	t1
+	lw		t1,	0(t0)
+	li		t0,	1
+	xor		s4,	t1,	t0
+	mv		t0,	s4
 	seqz	t0,	t0
 	beqz	t0,	.dijkstra.15_if_terminate
 	j		.dijkstra.15_if_true
 .dijkstra.15_if_true:
 	j		.dijkstra.14_while_condition
 .dijkstra.15_if_terminate:
-	mv		t1,	s2
-	mv		t0,	s1
-	li		t2,	4
-	mul		t2,	t2,	t1
-	add		t1,	t0,	t2
+	mv		t2,	s2
+	mv		t1,	s6
+	li		t0,	4
+	mul		s4,	t0,	t2
+	mv		t0,	s4
+	add		t1,	t1,	t0
 	li		t0,	1
 	sw		t0,	0(t1)
-	mv		t0,	s2
-	la		t1,	g
-	lw		t1,	0(t1)
-	addi	t1,	t1,	8
-	lw		t2,	0(t1)
-	li		t1,	4
-	mul		t1,	t1,	t0
-	add		t0,	t2,	t1
+	mv		t2,	s2
+	la		t0,	g
 	lw		t0,	0(t0)
-	mv		s0,	t0
+	addi	s4,	t0,	8
+	mv		t0,	s4
+	lw		t1,	0(t0)
+	li		t0,	4
+	mul		s4,	t0,	t2
+	mv		t0,	s4
+	add		t0,	t1,	t0
+	lw		t0,	0(t0)
+	mv		s1,	t0
 	j		.dijkstra.16_for_condition
 .dijkstra.16_for_condition:
-	mv		t0,	s0
+	mv		t0,	s1
 	li		t1,	1
-	sub		t1,	zero,	t1
+	sub		s4,	zero,	t1
+	mv		t1,	s4
 	xor		t0,	t0,	t1
 	snez	t0,	t0
 	beqz	t0,	.dijkstra.16_for_terminate
 	j		.dijkstra.16_for_loop
 .dijkstra.16_for_loop:
-	mv		t0,	s0
-	la		t1,	g
-	lw		t1,	0(t1)
-	addi	t1,	t1,	0
-	lw		t2,	0(t1)
-	li		t1,	4
-	mul		t1,	t1,	t0
-	add		t0,	t2,	t1
+	mv		t2,	s1
+	la		t0,	g
 	lw		t0,	0(t0)
-	addi	t0,	t0,	4
+	addi	s4,	t0,	0
+	mv		t0,	s4
+	lw		t0,	0(t0)
+	li		t1,	4
+	mul		s4,	t1,	t2
+	mv		t1,	s4
+	add		t0,	t0,	t1
+	lw		t0,	0(t0)
+	addi	s4,	t0,	4
+	mv		t0,	s4
 	lw		t0,	0(t0)
 	mv		s3,	t0
-	mv		t0,	s0
-	la		t1,	g
-	lw		t1,	0(t1)
-	addi	t1,	t1,	0
-	lw		t2,	0(t1)
+	mv		t2,	s1
+	la		t0,	g
+	lw		t0,	0(t0)
+	addi	s4,	t0,	0
+	mv		t0,	s4
+	lw		t1,	0(t0)
+	li		t0,	4
+	mul		s4,	t0,	t2
+	mv		t0,	s4
+	add		t0,	t1,	t0
+	lw		t0,	0(t0)
+	addi	s4,	t0,	8
+	mv		t0,	s4
+	lw		t0,	0(t0)
+	mv		t2,	t0
+	mv		a0,	s2
+	mv		t0,	s5
 	li		t1,	4
-	mul		t1,	t1,	t0
-	add		t0,	t2,	t1
+	mul		s4,	t1,	a0
+	mv		t1,	s4
+	add		t0,	t0,	t1
 	lw		t0,	0(t0)
-	addi	t0,	t0,	8
-	lw		t2,	0(t0)
-	mv		t1,	s2
-	mv		t0,	s5
-	li		a0,	4
-	mul		a0,	a0,	t1
-	add		t0,	t0,	a0
+	mv		t1,	t2
+	add		s4,	t0,	t1
+	mv		t0,	s4
+	mv		a0,	t0
+	mv		t0,	s3
+	mv		t1,	s5
+	li		t2,	4
+	mul		s4,	t2,	t0
+	mv		t2,	s4
+	add		t0,	t1,	t2
 	lw		t0,	0(t0)
-	add		t2,	t0,	t2
-	mv		t1,	s3
-	mv		t0,	s5
-	li		a0,	4
-	mul		a0,	a0,	t1
-	add		t0,	t0,	a0
-	lw		t0,	0(t0)
-	slt		t0,	t2,	t0
+	slt		s4,	a0,	t0
+	mv		t0,	s4
 	seqz	t0,	t0
 	beqz	t0,	.dijkstra.17_if_terminate
 	j		.dijkstra.17_if_true
 .dijkstra.17_if_true:
 	j		.dijkstra.16_for_execution
 .dijkstra.17_if_terminate:
-	mv		t0,	s3
-	mv		t1,	s5
-	li		a0,	4
-	mul		a0,	a0,	t0
-	add		t0,	t1,	a0
-	sw		t2,	0(t0)
+	mv		t2,	s3
+	mv		t0,	s5
+	li		t1,	4
+	mul		s4,	t1,	t2
+	mv		t1,	s4
+	add		t0,	t0,	t1
+	mv		t1,	a0
+	sw		t1,	0(t0)
 	li		a0,	8
 	call	__malloc
 	mv		a1,	a0
-	addi	t1,	a1,	0
-	mv		t0,	s3
-	sw		t0,	0(t1)
-	addi	t2,	a1,	4
+	mv		t0,	a1
+	addi	s4,	t0,	0
+	mv		t0,	s4
 	mv		t1,	s3
-	mv		t0,	s5
-	li		a0,	4
-	mul		a0,	a0,	t1
-	add		t0,	t0,	a0
+	sw		t1,	0(t0)
+	mv		t0,	a1
+	addi	s4,	t0,	4
+	mv		t1,	s4
+	mv		t0,	s3
+	mv		a0,	s5
+	li		t2,	4
+	mul		s4,	t2,	t0
+	mv		t2,	s4
+	add		t0,	a0,	t2
 	lw		t0,	0(t0)
-	sw		t0,	0(t2)
-	mv		a0,	s4
+	sw		t0,	0(t1)
+	mv		t0,	s0
+	mv		a0,	t0
 	call	Heap_Node.push
 	j		.dijkstra.16_for_execution
 .dijkstra.16_for_execution:
-	mv		t0,	s0
+	mv		t0,	s1
 	la		t1,	g
 	lw		t1,	0(t1)
-	addi	t1,	t1,	4
+	addi	s4,	t1,	4
+	mv		t1,	s4
 	lw		t2,	0(t1)
 	li		t1,	4
-	mul		t1,	t1,	t0
+	mul		s4,	t1,	t0
+	mv		t1,	s4
 	add		t0,	t2,	t1
 	lw		t0,	0(t0)
-	mv		s0,	t0
+	mv		s1,	t0
 	j		.dijkstra.16_for_condition
 .dijkstra.16_for_terminate:
 	j		.dijkstra.14_while_condition
@@ -1381,13 +1492,13 @@ dijkstra:
 	mv		a0,	s5
 	j		.dijkstra.return
 .dijkstra.return:
-	lw		s0,	32(sp)
-	lw		s1,	8(sp)
-	lw		s2,	12(sp)
-	lw		s3,	16(sp)
-	lw		s4,	20(sp)
-	lw		s5,	24(sp)
-	lw		s9,	28(sp)
+	lw		s0,	8(sp)
+	lw		s1,	12(sp)
+	lw		s2,	16(sp)
+	lw		s3,	20(sp)
+	lw		s4,	24(sp)
+	lw		s5,	28(sp)
+	lw		s6,	32(sp)
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
 	addi	sp,	sp,	36
@@ -1400,13 +1511,18 @@ dijkstra:
 
 main:
 .main.entry:
-	addi	sp,	sp,	-20
+	addi	sp,	sp,	-24
 	sw		ra,	4(sp)
 	sw		s0,	0(sp)
-	addi	s0,	sp,	20
-	sw		s0,	8(sp)
-	sw		s1,	12(sp)
-	sw		s2,	16(sp)
+	addi	s0,	sp,	24
+	mv		t0,	s0
+	sw		t0,	8(sp)
+	mv		t0,	s1
+	sw		t0,	12(sp)
+	mv		t0,	s2
+	sw		t0,	16(sp)
+	mv		t0,	s6
+	sw		t0,	20(sp)
 	call	__global_init_0
 	call	init
 	mv		s1,	zero
@@ -1428,19 +1544,22 @@ main:
 	mv		t0,	s0
 	la		t1,	n
 	lw		t1,	0(t1)
-	slt		t0,	t0,	t1
+	slt		s6,	t0,	t1
+	mv		t0,	s6
 	beqz	t0,	.main.19_for_terminate
 	j		.main.19_for_loop
 .main.19_for_loop:
 	mv		t1,	s0
 	mv		t0,	s2
 	li		t2,	4
-	mul		t2,	t2,	t1
+	mul		s6,	t2,	t1
+	mv		t2,	s6
 	add		t0,	t0,	t2
+	lw		t1,	0(t0)
+	la		t0,	INF
 	lw		t0,	0(t0)
-	la		t1,	INF
-	lw		t1,	0(t1)
-	xor		t0,	t0,	t1
+	xor		s6,	t1,	t0
+	mv		t0,	s6
 	seqz	t0,	t0
 	beqz	t0,	.main.20_if_false
 	j		.main.20_if_true
@@ -1452,7 +1571,8 @@ main:
 	mv		t1,	s0
 	mv		t0,	s2
 	li		t2,	4
-	mul		t2,	t2,	t1
+	mul		s6,	t2,	t1
+	mv		t2,	s6
 	add		t0,	t0,	t2
 	lw		a0,	0(t0)
 	call	toString
@@ -1465,7 +1585,8 @@ main:
 .main.19_for_execution:
 	mv		t0,	s0
 	li		t1,	1
-	add		t0,	t0,	t1
+	add		s6,	t0,	t1
+	mv		t0,	s6
 	mv		s0,	t0
 	j		.main.19_for_condition
 .main.19_for_terminate:
@@ -1475,7 +1596,8 @@ main:
 .main.18_for_execution:
 	mv		t0,	s1
 	li		t1,	1
-	add		t0,	t0,	t1
+	add		s6,	t0,	t1
+	mv		t0,	s6
 	mv		s1,	t0
 	j		.main.18_for_condition
 .main.18_for_terminate:
@@ -1485,9 +1607,10 @@ main:
 	lw		s0,	8(sp)
 	lw		s1,	12(sp)
 	lw		s2,	16(sp)
+	lw		s6,	20(sp)
 	lw		ra,	4(sp)
 	lw		s0,	0(sp)
-	addi	sp,	sp,	20
+	addi	sp,	sp,	24
 	ret
 	.size	main,	.-main
 
