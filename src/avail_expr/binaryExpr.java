@@ -16,7 +16,7 @@ public class binaryExpr extends expr {
     }
 
     @Override
-    boolean equals(expr it) {
+    public boolean equals(expr it) {
         if (!(it instanceof binaryExpr)) return false;
         if (!Objects.equals(((binaryExpr) it).op, op)) return false;
         if (Objects.equals(op, "addi")) {
@@ -33,4 +33,10 @@ public class binaryExpr extends expr {
             return rs1 == ((binaryExpr) it).rs1 && rs2 == ((binaryExpr) it).rs2;
         }
     }
+
+    @Override
+    public String toString() {
+        return op + " " + rs1 + " " + rs2 + " " + imm;
+    }
+
 }

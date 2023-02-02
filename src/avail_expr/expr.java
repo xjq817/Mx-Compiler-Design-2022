@@ -8,5 +8,6 @@ abstract public class expr {
     public ASMRegister rs2;
     public ASMImm imm;
 
-    abstract boolean equals(expr it);
+    abstract public boolean equals(expr it);
+    abstract public String toString();
 }

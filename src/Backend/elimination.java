@@ -4,14 +4,12 @@ import ASM.ASMBlock;
 import ASM.ASMFunction;
 import ASM.ASMGlobalBlock;
 import ASM.Instruction.*;
-import ASM.Operand.ASMImm;
 import ASM.Operand.ASMVirtualRegister;
 import avail_expr.binaryExpr;
 import avail_expr.expr;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Objects;
 
 public class elimination {
     ASMGlobalBlock gBlock;
@@ -56,6 +54,8 @@ public class elimination {
             ASMInstruction inst = block.instructions.get(i);
             if (instExpr.containsKey(inst) && instExpr.get(inst).equals(expr)) {
                 block.instructions.add(i + 1, new ASMMvInstruction(inst.rd, n));
+                inst.def.remove(inst.rd);
+                inst.def.add(n);
                 inst.rd = n;
                 instExpr.replace(inst, expr);
                 return;
@@ -96,19 +96,20 @@ public class elimination {
         it.blocks.forEach(block -> {
             HashSet<expr> gen = new HashSet<>();
             HashSet<expr> kill = new HashSet<>();
-            for (int i = block.instructions.size() - 1; i >= 0; i--) {
-                ASMInstruction inst = block.instructions.get(i);
-                if (inst.rd != null)
-                    for (expr expr : allExpr) {
-                        if (expr.rs1 == inst.rd || expr.rs2 == inst.rd)
-                            kill.add(expr);
-                    }
-                if (instExpr.containsKey(inst)) {
-                    if (!kill.contains(instExpr.get(inst)))
-                        gen.add(instExpr.get(inst));
-                }
 
+            for (int i = 0; i < block.instructions.size(); i++) {
+                ASMInstruction inst = block.instructions.get(i);
+                if (instExpr.containsKey(inst))
+                    gen.add(instExpr.get(inst));
+                gen.removeIf(expr -> inst.def.contains(expr.rs1) || inst.def.contains(expr.rs2));
+
+                if (instExpr.containsKey(inst))
+                    kill.remove(instExpr.get(inst));
+                for (expr expr : allExpr)
+                    if (inst.def.contains(expr.rs1) || inst.def.contains(expr.rs2))
+                        kill.add(expr);
             }
+
             blockGen.put(block, gen);
             blockKill.put(block, kill);
             if (block == it.entryBlock)
@@ -118,23 +119,20 @@ public class elimination {
         });
         while (true) {
             boolean flag = true;
-            HashMap<ASMBlock,HashSet<expr>> newBlockIn=new HashMap<>();
-            HashMap<ASMBlock,HashSet<expr>> newBlockOut=new HashMap<>();
             for (ASMBlock block : it.blocks) {
-                newBlockIn.put(block,blockIn.get(block));
-                newBlockOut.put(block,blockOut.get(block));
                 if (block != it.entryBlock) {
-                    HashSet<expr> in = newBlockIn.get(block);
-                    in.removeAll(blockKill.get(block));
-                    in.addAll(blockGen.get(block));
-                    HashSet<expr> out = newBlockOut.get(block);
-                    out.addAll(in);
-                    in.clear();
+                    HashSet<expr> in = blockIn.get(block);
+                    int inSize = in.size();
                     in.addAll(allExpr);
                     for (ASMBlock pred : block.pred)
                         in.retainAll(blockOut.get(pred));
-                    if (blockOut.get(block).size() != out.size())
-                        flag = false;
+                    HashSet<expr> out = blockOut.get(block);
+                    int outSize = out.size();
+                    out.clear();
+                    out.addAll(in);
+                    out.removeAll(blockKill.get(block));
+                    out.addAll(blockGen.get(block));
+                    if (in.size() != inSize || out.size() != outSize) flag = false;
                     blockIn.replace(block, in);
                     blockOut.replace(block, out);
                 }
@@ -143,13 +141,27 @@ public class elimination {
         }
         it.blocks.forEach(block -> {
             HashSet<expr> gen = new HashSet<>(blockIn.get(block));
+            curBlock = block;
+//            System.out.println("********************************");
+//            System.out.println(block.name + ":");
+//            System.out.println("in:");
+//            for (expr expr : blockIn.get(block)) System.out.println(expr);
+//            System.out.println("out");
+//            for (expr expr : blockOut.get(block)) System.out.println(expr);
+//            System.out.println("gen:");
+//            for (expr expr : blockGen.get(block)) System.out.println(expr);
+//            System.out.println("kill");
+//            for (expr expr : blockKill.get(block)) System.out.println(expr);
+//            if (Objects.equals(block.name, "main.0_for_execution")) {
+//                System.out.println("fuck");
+//            }
             for (int i = 0; i < block.instructions.size(); i++) {
                 ASMInstruction inst = block.instructions.get(i);
                 if (!instExpr.containsKey(inst)) continue;
                 expr expr = instExpr.get(inst);
                 if (gen.contains(expr)) {
                     ASMVirtualRegister n = new ASMVirtualRegister("eliminate");
-                    inst = new ASMMvInstruction(inst.rd, n);
+                    block.instructions.set(i, new ASMMvInstruction(inst.rd, n));
                     dfsCnt++;
                     dfs(block, n, expr, i);
                 }
