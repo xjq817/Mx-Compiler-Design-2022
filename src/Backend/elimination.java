@@ -7,6 +7,7 @@ import ASM.Instruction.*;
 import ASM.Operand.ASMVirtualRegister;
 import avail_expr.binaryExpr;
 import avail_expr.expr;
+import avail_expr.memoryExpr;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -87,6 +88,12 @@ public class elimination {
                     expr = new binaryExpr(((ASMBinaryInstruction) inst).op, inst.rs1, inst.rs2, inst.imm);
                 else if (inst instanceof ASMCmpInstruction)
                     expr = new binaryExpr(((ASMCmpInstruction) inst).op, inst.rs1, inst.rs2, inst.imm);
+                else if (inst instanceof ASMStoreInstruction)
+                    expr = new memoryExpr(((ASMStoreInstruction) inst).bit, inst.rs1, inst.imm);
+                else if (inst instanceof ASMLoadInstruction)
+                    expr = new memoryExpr(((ASMLoadInstruction) inst).bit, inst.rs1, inst.imm);
+                else if (inst instanceof ASMLiInstruction)
+                    expr = new binaryExpr("li", null, null, inst.imm);
                 if (expr != null) {
                     allExpr.add(expr);
                     instExpr.put(inst, expr);
@@ -102,12 +109,18 @@ public class elimination {
                 if (instExpr.containsKey(inst))
                     gen.add(instExpr.get(inst));
                 gen.removeIf(expr -> inst.def.contains(expr.rs1) || inst.def.contains(expr.rs2));
+                if (inst instanceof ASMStoreInstruction || inst instanceof ASMCallInstruction)
+                    gen.removeIf(e -> e instanceof memoryExpr);
 
                 if (instExpr.containsKey(inst))
                     kill.remove(instExpr.get(inst));
-                for (expr expr : allExpr)
+                for (expr expr : allExpr) {
                     if (inst.def.contains(expr.rs1) || inst.def.contains(expr.rs2))
                         kill.add(expr);
+                    else if (expr instanceof memoryExpr &&
+                            (inst instanceof ASMStoreInstruction || inst instanceof ASMCallInstruction))
+                        kill.add(expr);
+                }
             }
 
             blockGen.put(block, gen);
@@ -157,17 +170,19 @@ public class elimination {
 //            }
             for (int i = 0; i < block.instructions.size(); i++) {
                 ASMInstruction inst = block.instructions.get(i);
-                if (!instExpr.containsKey(inst)) continue;
-                expr expr = instExpr.get(inst);
-                if (gen.contains(expr)) {
-                    ASMVirtualRegister n = new ASMVirtualRegister("eliminate");
-                    block.instructions.set(i, new ASMMvInstruction(inst.rd, n));
-                    dfsCnt++;
-                    dfs(block, n, expr, i);
+                if (instExpr.containsKey(inst)) {
+                    expr expr = instExpr.get(inst);
+                    if (gen.contains(expr)) {
+                        ASMVirtualRegister n = new ASMVirtualRegister("eliminate");
+                        block.instructions.set(i, new ASMMvInstruction(inst.rd, n));
+                        dfsCnt++;
+                        dfs(block, n, expr, i);
+                    }
+                    gen.add(expr);
                 }
-                gen.add(expr);
-                ASMInstruction finalInst = inst;
-                gen.removeIf(e -> e.rs1 == finalInst.rd || e.rs2 == finalInst.rd);
+                gen.removeIf(e -> e.rs1 == inst.rd || e.rs2 == inst.rd);
+                if (inst instanceof ASMStoreInstruction || inst instanceof ASMCallInstruction)
+                    gen.removeIf(e -> e instanceof memoryExpr);
             }
         });
     }

@@ -13,27 +13,27 @@ EdgeList.init:
 	sw		s2,	20(sp)
 	sw		s7,	12(sp)
 	sw		s9,	16(sp)
-	mv		s2,	a0
+	mv		s7,	a0
 	mv		s0,	a1
-	mv		s7,	a2
+	mv		s2,	a2
 	li		t0,	4
-	mul		t1,	s7,	t0
+	mul		t1,	s2,	t0
 	li		t0,	4
 	add		a0,	t1,	t0
 	call	__malloc
-	sw		s7,	0(a0)
+	sw		s2,	0(a0)
 	addi	t1,	a0,	4
-	mv		t0,	s2
+	mv		t0,	s7
 	addi	t0,	t0,	0
 	sw		t1,	0(t0)
 	li		t0,	4
-	mul		t1,	s7,	t0
+	mul		t1,	s2,	t0
 	li		t0,	4
 	add		a0,	t1,	t0
 	call	__malloc
-	sw		s7,	0(a0)
+	sw		s2,	0(a0)
 	addi	t1,	a0,	4
-	mv		t0,	s2
+	mv		t0,	s7
 	addi	t0,	t0,	4
 	sw		t1,	0(t0)
 	li		t0,	4
@@ -43,18 +43,18 @@ EdgeList.init:
 	call	__malloc
 	sw		s0,	0(a0)
 	addi	t1,	a0,	4
-	mv		t0,	s2
+	mv		t0,	s7
 	addi	t0,	t0,	8
 	sw		t1,	0(t0)
 	mv		t1,	zero
 	j		.EdgeList.init.0_for_condition
 .EdgeList.init.0_for_condition:
-	mv		t0,	s7
+	mv		t0,	s2
 	slt		t0,	t1,	t0
 	beqz	t0,	.EdgeList.init.0_for_terminate
 	j		.EdgeList.init.0_for_loop
 .EdgeList.init.0_for_loop:
-	mv		t0,	s2
+	mv		t0,	s7
 	addi	t0,	t0,	4
 	lw		t0,	0(t0)
 	li		t2,	4
@@ -77,7 +77,7 @@ EdgeList.init:
 	beqz	t0,	.EdgeList.init.1_for_terminate
 	j		.EdgeList.init.1_for_loop
 .EdgeList.init.1_for_loop:
-	mv		t0,	s2
+	mv		t0,	s7
 	addi	t0,	t0,	8
 	lw		t0,	0(t0)
 	li		t2,	4
@@ -92,7 +92,7 @@ EdgeList.init:
 	add		t1,	t1,	t0
 	j		.EdgeList.init.1_for_condition
 .EdgeList.init.1_for_terminate:
-	mv		t0,	s2
+	mv		t0,	s7
 	addi	t0,	t0,	12
 	sw		zero,	0(t0)
 	j		.EdgeList.init.return
@@ -123,51 +123,51 @@ EdgeList.addEdge:
 	sw		s5,	16(sp)
 	sw		s6,	24(sp)
 	sw		s9,	20(sp)
-	mv		s3,	a0
-	mv		s1,	a1
-	mv		s0,	a3
-	mv		s5,	a2
+	mv		s3,	a2
+	mv		s1,	a0
+	mv		s0,	a1
+	mv		s5,	a3
 	li		a0,	12
 	call	__malloc
 	addi	t0,	a0,	0
-	sw		s1,	0(t0)
-	addi	t0,	a0,	4
-	sw		s5,	0(t0)
-	addi	t0,	a0,	8
 	sw		s0,	0(t0)
-	addi	t0,	s3,	12
+	addi	t0,	a0,	4
+	sw		s3,	0(t0)
+	addi	t0,	a0,	8
+	sw		s5,	0(t0)
+	addi	t0,	s1,	12
 	lw		t0,	0(t0)
-	addi	t1,	s3,	0
+	addi	t1,	s1,	0
 	lw		t1,	0(t1)
 	li		t2,	4
 	mul		t2,	t2,	t0
 	add		t0,	t1,	t2
 	sw		a0,	0(t0)
-	addi	t0,	s3,	12
+	addi	t0,	s1,	12
 	lw		t0,	0(t0)
-	addi	t1,	s3,	4
+	addi	t1,	s1,	4
 	lw		t1,	0(t1)
 	li		t2,	4
 	mul		t2,	t2,	t0
 	add		t0,	t1,	t2
-	addi	t1,	s3,	8
+	addi	t1,	s1,	8
 	lw		t2,	0(t1)
 	li		t1,	4
-	mul		t1,	t1,	s1
+	mul		t1,	t1,	s0
 	add		t1,	t2,	t1
 	lw		t1,	0(t1)
 	sw		t1,	0(t0)
-	addi	t0,	s3,	8
+	addi	t0,	s1,	8
 	lw		t1,	0(t0)
 	li		t0,	4
-	mul		t0,	t0,	s1
+	mul		t0,	t0,	s0
 	add		t1,	t1,	t0
-	addi	t0,	s3,	12
+	addi	t0,	s1,	12
 	lw		t0,	0(t0)
 	sw		t0,	0(t1)
-	addi	t0,	s3,	12
+	addi	t0,	s1,	12
 	lw		t0,	0(t0)
-	addi	t1,	s3,	12
+	addi	t1,	s1,	12
 	li		t2,	1
 	add		t0,	t0,	t2
 	sw		t0,	0(t1)
@@ -1120,12 +1120,11 @@ init:
 	call	getInt
 	mv		s0,	a0
 	call	getInt
+	mv		a3,	a0
 	la		t0,	g
-	lw		t0,	0(t0)
+	lw		a0,	0(t0)
 	mv		a1,	s7
 	mv		a2,	s0
-	mv		a3,	a0
-	mv		a0,	t0
 	call	EdgeList.addEdge
 	j		.init.12_for_execution
 .init.12_for_execution:
@@ -1243,8 +1242,7 @@ dijkstra:
 .dijkstra.14_while_loop:
 	mv		a0,	s5
 	call	Heap_Node.pop
-	mv		a1,	a0
-	addi	t0,	a1,	0
+	addi	t0,	a0,	0
 	lw		t0,	0(t0)
 	mv		s3,	t0
 	mv		t1,	s3
@@ -1339,19 +1337,20 @@ dijkstra:
 	sw		t2,	0(t0)
 	li		a0,	8
 	call	__malloc
-	mv		a1,	a0
-	addi	t1,	a1,	0
+	addi	t1,	a0,	0
 	mv		t0,	s6
 	sw		t0,	0(t1)
-	addi	a0,	a1,	4
+	addi	a1,	a0,	4
 	mv		t0,	s6
 	mv		t1,	s4
 	li		t2,	4
 	mul		t2,	t2,	t0
 	add		t0,	t1,	t2
 	lw		t0,	0(t0)
-	sw		t0,	0(a0)
-	mv		a0,	s5
+	sw		t0,	0(a1)
+	mv		t0,	s5
+	mv		a1,	a0
+	mv		a0,	t0
 	call	Heap_Node.push
 	j		.dijkstra.16_for_execution
 .dijkstra.16_for_execution:
