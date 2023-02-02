@@ -297,7 +297,7 @@ public class ASMBuilder implements IRVisitor {
 
         //new ASMPrinter(System.out).visit(gBlock);
 
-        new elimination().visit(gBlock);
+        //new elimination().visit(gBlock);
 
         new GraphColoring().visit(gBlock);
 /*

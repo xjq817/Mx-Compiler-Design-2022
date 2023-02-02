@@ -116,9 +116,6 @@ public class elimination {
             else blockOut.put(block, new HashSet<>(allExpr));
             blockIn.put(block, new HashSet<>());
         });
-//        if (Objects.equals(it.name, "main")) {
-//            System.out.println("fuck");
-//        }
         while (true) {
             boolean flag = true;
             HashMap<ASMBlock,HashSet<expr>> newBlockIn=new HashMap<>();
@@ -145,7 +142,6 @@ public class elimination {
             if (flag) break;
         }
         it.blocks.forEach(block -> {
-
             HashSet<expr> gen = new HashSet<>(blockIn.get(block));
             for (int i = 0; i < block.instructions.size(); i++) {
                 ASMInstruction inst = block.instructions.get(i);

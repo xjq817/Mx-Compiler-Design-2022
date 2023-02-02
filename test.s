@@ -1157,8 +1157,7 @@ init:
 	sw		t0,	8(sp)
 	mv		t0,	s5
 	sw		t0,	12(sp)
-	mv		t0,	s6
-	sw		t0,	24(sp)
+	sw		s6,	24(sp)
 	mv		t0,	s7
 	sw		t0,	16(sp)
 	mv		t0,	s9
@@ -1180,10 +1179,10 @@ init:
 	la		t0,	m
 	lw		a2,	0(t0)
 	call	EdgeList.init
-	mv		s4,	zero
+	mv		s6,	zero
 	j		.init.12_for_condition
 .init.12_for_condition:
-	mv		t0,	s4
+	mv		t0,	s6
 	la		t1,	m
 	lw		t1,	0(t1)
 	slt		t0,	t0,	t1
@@ -1191,22 +1190,24 @@ init:
 	j		.init.12_for_loop
 .init.12_for_loop:
 	call	getInt
+	mv		s4,	a0
+	call	getInt
 	mv		s5,	a0
 	call	getInt
-	mv		s6,	a0
-	call	getInt
-	mv		a3,	a0
 	la		t0,	g
-	lw		a0,	0(t0)
-	mv		a1,	s5
-	mv		a2,	s6
+	lw		t0,	0(t0)
+	mv		a1,	s4
+	mv		a2,	s5
+	mv		a3,	a0
+	mv		a0,	t0
 	call	EdgeList.addEdge
 	j		.init.12_for_execution
 .init.12_for_execution:
-	li		t0,	1
-	add		s7,	s4,	t0
+	mv		t0,	s6
+	li		t1,	1
+	add		s7,	t0,	t1
 	mv		t0,	s7
-	mv		s4,	t0
+	mv		s6,	t0
 	j		.init.12_for_condition
 .init.12_for_terminate:
 	j		.init.return
@@ -1307,17 +1308,17 @@ dijkstra:
 	call	Heap_Node.__cons
 	li		a0,	8
 	call	__malloc
-	mv		t0,	a0
+	mv		a1,	a0
+	mv		t0,	a1
 	addi	s4,	t0,	4
 	mv		t0,	s4
 	sw		zero,	0(t0)
-	mv		t0,	a0
+	mv		t0,	a1
 	addi	s4,	t0,	0
 	mv		t0,	s4
 	mv		t1,	s1
 	sw		t1,	0(t0)
 	mv		t0,	s0
-	mv		a1,	a0
 	mv		a0,	t0
 	call	Heap_Node.push
 	j		.dijkstra.14_while_condition
@@ -1332,8 +1333,7 @@ dijkstra:
 .dijkstra.14_while_loop:
 	mv		a0,	s0
 	call	Heap_Node.pop
-	mv		a1,	a0
-	mv		t0,	a1
+	mv		t0,	a0
 	addi	s4,	t0,	0
 	mv		t0,	s4
 	lw		t0,	0(t0)
@@ -1451,24 +1451,24 @@ dijkstra:
 	sw		t1,	0(t0)
 	li		a0,	8
 	call	__malloc
-	mv		a1,	a0
-	mv		t0,	a1
+	mv		t0,	a0
 	addi	s4,	t0,	0
 	mv		t0,	s4
 	mv		t1,	s3
 	sw		t1,	0(t0)
-	mv		t0,	a1
+	mv		t0,	a0
 	addi	s4,	t0,	4
 	mv		t1,	s4
 	mv		t0,	s3
-	mv		a0,	s5
+	mv		a1,	s5
 	li		t2,	4
 	mul		s4,	t2,	t0
 	mv		t2,	s4
-	add		t0,	a0,	t2
+	add		t0,	a1,	t2
 	lw		t0,	0(t0)
 	sw		t0,	0(t1)
 	mv		t0,	s0
+	mv		a1,	a0
 	mv		a0,	t0
 	call	Heap_Node.push
 	j		.dijkstra.16_for_execution
