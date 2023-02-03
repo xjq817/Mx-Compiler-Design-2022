@@ -17,7 +17,6 @@ import Util.error.ASMError;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Objects;
 
 public class ASMBuilder implements IRVisitor {
@@ -67,7 +66,16 @@ public class ASMBuilder implements IRVisitor {
         return op;
     }
 
-    HashMap<Integer,ASMRegister> immReg;
+    HashMap<Integer, ASMRegister> immReg;
+
+    int transInt(IRValue value) {
+        int imm;
+        if (value instanceof IRConstInt) imm = ((IRConstInt) value).value;
+        else if (value instanceof IRConstBool) imm = ((IRConstBool) value).value ? 1 : 0;
+        else if (value instanceof IRConstNull) imm = 0;
+        else throw new ASMError("value is not a imm");
+        return imm;
+    }
 
     ASMRegister transVReg(IRValue value) {
         if (value instanceof IRRegister) {
@@ -89,15 +97,11 @@ public class ASMBuilder implements IRVisitor {
             return virtualReg;
         }
         ASMVirtualRegister virtualReg = new ASMVirtualRegister("const");
-        int imm;
-        if (value instanceof IRConstInt) imm = ((IRConstInt) value).value;
-        else if (value instanceof IRConstBool) imm = ((IRConstBool) value).value ? 1 : 0;
-        else if (value instanceof IRConstNull) imm = 0;
-        else throw new ASMError("trans virtual register error.");
+        int imm = transInt(value);
         if (imm == 0) return gBlock.physicalRegs.get(0);
         if (immReg.containsKey(imm)) return immReg.get(imm);
         curBlock.instructions.add(new ASMLiInstruction(virtualReg, new ASMImm(imm)));
-        immReg.put(imm,virtualReg);
+        immReg.put(imm, virtualReg);
         return virtualReg;
     }
 
@@ -170,11 +174,18 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRBinaryInstruction it) {
+        String op = transOp(it.op);
         ASMRegister rd, rs1, rs2;
         rd = transVReg(it.register);
         rs1 = transVReg(it.lhs);
-        rs2 = transVReg(it.rhs);
-        curBlock.instructions.add(new ASMBinaryInstruction(transOp(it.op), null, rd, rs1, rs2));
+        if (it.rhs instanceof IRConst && !op.equals("mul") && !op.equals("div") && !op.equals("rem") && !op.equals("sub")) {
+            curBlock.instructions.add(new ASMBinaryInstruction(op + "i", new ASMImm(transInt(it.rhs)), rd, rs1, null));
+        } else if (it.rhs instanceof IRConst && op.equals("sub")) {
+            curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(-transInt(it.rhs)), rd, rs1, null));
+        } else {
+            rs2 = transVReg(it.rhs);
+            curBlock.instructions.add(new ASMBinaryInstruction(op, null, rd, rs1, rs2));
+        }
     }
 
     @Override
@@ -360,10 +371,10 @@ public class ASMBuilder implements IRVisitor {
                     newInst = new ArrayList<>();
                     cur.instructions.forEach(inst -> {
                         if (inst instanceof ASMBinaryInstruction
-                                && Objects.equals(((ASMBinaryInstruction) inst).op, "addi")
+                                && inst.imm != null
                                 && !checkImm(inst.imm.imm)) {
                             newInst.add(new ASMLiInstruction(t0, inst.imm));
-                            newInst.add(new ASMBinaryInstruction("add", null, inst.rd, inst.rs1, t0));
+                            newInst.add(new ASMBinaryInstruction(((ASMBinaryInstruction) inst).op.substring(0,2), null, inst.rd, inst.rs1, t0));
                         } else newInst.add(inst);
                     });
                     cur.instructions = newInst;
@@ -374,7 +385,7 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRBlock it) {
-        immReg=new HashMap<>();
+        immReg = new HashMap<>();
         it.instructions.forEach(cur -> cur.accept(this));
     }
 
