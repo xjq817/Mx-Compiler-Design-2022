@@ -28,7 +28,7 @@ public class elimination {
 
     HashMap<ASMInstruction, expr> instExpr;
 
-    int dfsCnt = 0;
+    int dfsCnt;
 
     HashMap<ASMBlock, Integer> visit;
 
@@ -43,6 +43,8 @@ public class elimination {
         blockOut = new HashMap<>();
 
         instExpr = new HashMap<>();
+
+        dfsCnt = 0;
 
         visit = new HashMap<>();
     }
@@ -185,6 +187,7 @@ public class elimination {
                     gen.removeIf(e -> e instanceof memoryExpr);
             }
         });
+        if (dfsCnt > 0) visit(it);
     }
 
     public void visit(ASMGlobalBlock it) {

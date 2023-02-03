@@ -16,6 +16,7 @@ import IR.Instruction.*;
 import Util.error.ASMError;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -66,6 +67,8 @@ public class ASMBuilder implements IRVisitor {
         return op;
     }
 
+    HashMap<Integer,ASMRegister> immReg;
+
     ASMRegister transVReg(IRValue value) {
         if (value instanceof IRRegister) {
             IRRegister reg = (IRRegister) value;
@@ -92,7 +95,9 @@ public class ASMBuilder implements IRVisitor {
         else if (value instanceof IRConstNull) imm = 0;
         else throw new ASMError("trans virtual register error.");
         if (imm == 0) return gBlock.physicalRegs.get(0);
+        if (immReg.containsKey(imm)) return immReg.get(imm);
         curBlock.instructions.add(new ASMLiInstruction(virtualReg, new ASMImm(imm)));
+        immReg.put(imm,virtualReg);
         return virtualReg;
     }
 
@@ -297,7 +302,7 @@ public class ASMBuilder implements IRVisitor {
 
         //new ASMPrinter(System.out).visit(gBlock);
 
-        new elimination().visit(gBlock);
+        //new elimination().visit(gBlock);
 
         new GraphColoring().visit(gBlock);
 /*
@@ -369,6 +374,7 @@ public class ASMBuilder implements IRVisitor {
 
     @Override
     public void visit(IRBlock it) {
+        immReg=new HashMap<>();
         it.instructions.forEach(cur -> cur.accept(this));
     }
 
