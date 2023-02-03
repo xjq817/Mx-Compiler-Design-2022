@@ -374,7 +374,7 @@ public class ASMBuilder implements IRVisitor {
                                 && inst.imm != null
                                 && !checkImm(inst.imm.imm)) {
                             newInst.add(new ASMLiInstruction(t0, inst.imm));
-                            newInst.add(new ASMBinaryInstruction(((ASMBinaryInstruction) inst).op.substring(0,2), null, inst.rd, inst.rs1, t0));
+                            newInst.add(new ASMBinaryInstruction(((ASMBinaryInstruction) inst).op.substring(0,3), null, inst.rd, inst.rs1, t0));
                         } else newInst.add(inst);
                     });
                     cur.instructions = newInst;
