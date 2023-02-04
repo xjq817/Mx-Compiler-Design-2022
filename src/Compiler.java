@@ -20,11 +20,11 @@ import java.io.PrintStream;
 
 public class Compiler {
     public static void main(String[] args) throws Exception {
-        InputStream input = new FileInputStream("test.mx");
-        PrintStream iroutput = new PrintStream("test.ll");
-        PrintStream asmoutput = new PrintStream("test.s");
-        //InputStream input = System.in;
-        //PrintStream asmoutput = new PrintStream("output.s");
+        //InputStream input = new FileInputStream("test.mx");
+        //PrintStream iroutput = new PrintStream("test.ll");
+        //PrintStream asmoutput = new PrintStream("test.s");
+        InputStream input = System.in;
+        PrintStream asmoutput = new PrintStream("output.s");
         GlobalScope globalScope = new GlobalScope(null);
         IRGlobalBlock irGlobalBlock = new IRGlobalBlock();
         ASMGlobalBlock asmGlobalBlock = new ASMGlobalBlock();
