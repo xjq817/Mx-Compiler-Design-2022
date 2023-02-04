@@ -178,9 +178,9 @@ public class ASMBuilder implements IRVisitor {
         ASMRegister rd, rs1, rs2;
         rd = transVReg(it.register);
         rs1 = transVReg(it.lhs);
-        if (it.rhs instanceof IRConst && !op.equals("mul") && !op.equals("div") && !op.equals("rem") && !op.equals("sub")) {
+        if (it.rhs instanceof IRConst && !op.equals("mul") && !op.equals("div") && !op.equals("rem") && !op.equals("sub") && checkImm(transInt(it.rhs))) {
             curBlock.instructions.add(new ASMBinaryInstruction(op + "i", new ASMImm(transInt(it.rhs)), rd, rs1, null));
-        } else if (it.rhs instanceof IRConst && op.equals("sub")) {
+        } else if (it.rhs instanceof IRConst && op.equals("sub") && checkImm(-transInt(it.rhs))) {
             curBlock.instructions.add(new ASMBinaryInstruction("addi", new ASMImm(-transInt(it.rhs)), rd, rs1, null));
         } else {
             rs2 = transVReg(it.rhs);
@@ -313,7 +313,7 @@ public class ASMBuilder implements IRVisitor {
 
         //new ASMPrinter(System.out).visit(gBlock);
 
-        //new elimination().visit(gBlock);
+        new elimination().visit(gBlock);
 
         new GraphColoring().visit(gBlock);
 /*
@@ -374,7 +374,7 @@ public class ASMBuilder implements IRVisitor {
                                 && inst.imm != null
                                 && !checkImm(inst.imm.imm)) {
                             newInst.add(new ASMLiInstruction(t0, inst.imm));
-                            newInst.add(new ASMBinaryInstruction(((ASMBinaryInstruction) inst).op.substring(0,3), null, inst.rd, inst.rs1, t0));
+                            newInst.add(new ASMBinaryInstruction(((ASMBinaryInstruction) inst).op.substring(0, 3), null, inst.rd, inst.rs1, t0));
                         } else newInst.add(inst);
                     });
                     cur.instructions = newInst;

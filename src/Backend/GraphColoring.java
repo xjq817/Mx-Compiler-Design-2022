@@ -534,8 +534,6 @@ public class GraphColoring {
                 else break;
             }
             AssignColors();
-            //System.out.println(curFunction.name);
-            //System.out.println(spilledNodes.size());
             if (!spilledNodes.isEmpty())
                 RewriteProgram();
             else break;

@@ -157,19 +157,6 @@ public class elimination {
         it.blocks.forEach(block -> {
             HashSet<expr> gen = new HashSet<>(blockIn.get(block));
             curBlock = block;
-//            System.out.println("********************************");
-//            System.out.println(block.name + ":");
-//            System.out.println("in:");
-//            for (expr expr : blockIn.get(block)) System.out.println(expr);
-//            System.out.println("out");
-//            for (expr expr : blockOut.get(block)) System.out.println(expr);
-//            System.out.println("gen:");
-//            for (expr expr : blockGen.get(block)) System.out.println(expr);
-//            System.out.println("kill");
-//            for (expr expr : blockKill.get(block)) System.out.println(expr);
-//            if (Objects.equals(block.name, "main.0_for_execution")) {
-//                System.out.println("fuck");
-//            }
             for (int i = 0; i < block.instructions.size(); i++) {
                 ASMInstruction inst = block.instructions.get(i);
                 if (instExpr.containsKey(inst)) {
